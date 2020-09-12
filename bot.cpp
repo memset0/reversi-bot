@@ -59,6 +59,7 @@ struct Map{
 
   inline u64 source()const{return a;}
   inline int count()const{return popcnt(a);}
+  inline int intersection(u64 rhs)const{return popcnt(a^rhs);}
 
   inline bit get(int k)const{return in(k,a);}
   inline void set(int k){a|=1ull<<k;}
@@ -192,39 +193,54 @@ inline void Board::move(bit c,int u){
 }
 
 // Function: Judge
+namespace Judger{
+  inline u64 build(const vector<pair<int,int>> &source){
+    u64 target=0;
+    for(const auto &pr:source){
+      target|=1ull<<id(pr.fir,pr.sec);
+    }
+    return target;
+  }
+  u64 corner=build({{0,0},{0,7},{7,0},{7,7}});
+}
 inline int Board::judge(bit c)const{
   int res=0;
   Map restMap=-1ull^this->map[0].source()^this->map[1].source();
+  int restCnt=restMap.count();
   for(int t=0;t<2;t++){
     const Map &thisMap=this->map[c];
     int sum=0,cnt=thisMap.count();
-    if(thisMap.get(0,0))sum+=1000;
-    if(thisMap.get(0,7))sum+=1000;
-    if(thisMap.get(7,0))sum+=1000;
-    if(thisMap.get(7,7))sum+=1000;
+    sum+=thisMap.intersection(Judger::corner)<<11;
     if(restMap.get(0,0)){
-      if(thisMap.get(0,1))sum-=25;
-      if(thisMap.get(1,0))sum-=25;
-      if(thisMap.get(1,1))sum-=75;
+      if(thisMap.get(0,1))sum-=24;
+      if(thisMap.get(1,0))sum-=24;
+      if(thisMap.get(1,1))sum-=56;
     }
     if(restMap.get(0,7)){
-      if(thisMap.get(1,7))sum-=25;
-      if(thisMap.get(0,6))sum-=25;
-      if(thisMap.get(1,6))sum-=75;
+      if(thisMap.get(1,7))sum-=24;
+      if(thisMap.get(0,6))sum-=24;
+      if(thisMap.get(1,6))sum-=56;
     }
     if(restMap.get(7,0)){
-      if(thisMap.get(7,1))sum-=25;
-      if(thisMap.get(6,0))sum-=25; 
-      if(thisMap.get(6,1))sum-=75;
+      if(thisMap.get(7,1))sum-=24;
+      if(thisMap.get(6,0))sum-=24; 
+      if(thisMap.get(6,1))sum-=56;
     }
     if(restMap.get(7,7)){
-      if(thisMap.get(6,7))sum-=25;
-      if(thisMap.get(7,6))sum-=25;
-      if(thisMap.get(6,6))sum-=75;
+      if(thisMap.get(6,7))sum-=24;
+      if(thisMap.get(7,6))sum-=24;
+      if(thisMap.get(6,6))sum-=56;
     }
-    sum+=this->getMoves(c).size()*50;
-    sum-=cnt*15; // learn to fake
-    if(!cnt)sum=-114514;
+    sum+=this->getMoves(c).size()<<5;
+    if(restCnt>32){
+      sum-=cnt<<4; // learn to fake
+    }else if(restCnt>16){
+      sum+=cnt<<5;
+    }else{
+      sum+=cnt<<9;
+    }
+    
+    if(!cnt)sum=-20040725;
     c^=1;
     res+=t?-sum:sum;
   }
