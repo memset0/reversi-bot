@@ -57,6 +57,9 @@ template<class T> struct vec:vector<T>{
 struct Map{
   u64 a;
 
+  inline u64 source()const{return a;}
+  inline int count()const{return popcnt(a);}
+
   inline bit get(int k)const{return in(k,a);}
   inline void set(int k){a|=1ull<<k;}
   inline void flip(int k){a^=1ull<<k;}
@@ -68,9 +71,8 @@ struct Map{
   inline void reset(int i,int j){a&=-1ull^(1ull<<id(i,j));}
   inline void paint(int i,int j,int x){x?this->set(i,j):this->reset(i,j);}
 
-  inline u64 source()const{return a;}
-
   Map():a(0ull){}
+  Map(u64 a):a(a){}
 };
 
 // Class: Board
@@ -81,6 +83,7 @@ struct Board{
   inline bit checkMove(bit,int)const;
   inline void move(bit,int);
   inline void move(bit,int,int);
+
   inline int judge(bit)const;
 
   inline void reverse(){swap(map[0],map[1]);}
@@ -118,7 +121,7 @@ struct Movement{
 
   Movement(int move):move(move){}
   Movement(int move,int value):move(move),value(value){}
-  Movement(int move,Board board,bit col):move(move){board.move(col,move),judge(board,col);}
+  Movement(int move,Board board,bit col):move(move){board.move(col,move),value=board.judge(col);}
 };
 
 // Function: init
@@ -144,8 +147,7 @@ void init(){
 
 // Function: get all moves
 inline vec<int> Board::getMoves(bit c)const{
-  // log("Board::getMoves(%d)\n",c);
-  // this->output();
+  // log("Board::getMoves(%d)\n",c),this->output();
   vec<int> res;
   for(int i=0;i<64;i++)
     if(!map[c].get(i)&&!map[c^1].get(i)){
@@ -186,49 +188,56 @@ inline void Board::move(bit c,int u){
       }
       if(!this->map[c^1].get(v))break;
     }
-  // log("Board::move(%d,%d)\n",idx(u),idy(u));
-  // this->output();
+  // log("Board::move(%d,%d)\n",idx(u),idy(u)),this->output();
 }
 
 // Function: Judge
-const int mapWeightTable[8][8]={
-  {1000,-25,10,5,5,10,-25,1000},
-  {-25,-50,1,1,1,1,-50,-25},
-  {10,1,3,2,2,3,1,10},
-  {5,1,2,1,1,2,1,5},
-  {5,1,2,1,1,2,1,5},
-  {10,1,3,2,2,3,1,10},
-  {-25,-50,1,1,1,1,-50,-25},
-  {1000,-25,10,5,5,10,-25,1000}
-};
-int judgeByMapWeight(const Board &board,bit c){
+inline int Board::judge(bit c)const{
   int res=0;
-  for(int i=0;i<8;i++)
-    for(int j=0;j<8;j++)
-      if(board.map[c].get(i,j)){
-        res+=mapWeightTable[i][j];
-      }else if(board.map[c^1].get(i,j)){
-        res-=mapWeightTable[i][j];
-      }
+  Map restMap=-1ull^this->map[0].source()^this->map[1].source();
+  for(int t=0;t<2;t++){
+    const Map &thisMap=this->map[c];
+    int sum=0,cnt=thisMap.count();
+    if(thisMap.get(0,0))sum+=1000;
+    if(thisMap.get(0,7))sum+=1000;
+    if(thisMap.get(7,0))sum+=1000;
+    if(thisMap.get(7,7))sum+=1000;
+    if(restMap.get(0,0)){
+      if(thisMap.get(0,1))sum-=25;
+      if(thisMap.get(1,0))sum-=25;
+      if(thisMap.get(1,1))sum-=75;
+    }
+    if(restMap.get(0,7)){
+      if(thisMap.get(1,7))sum-=25;
+      if(thisMap.get(0,6))sum-=25;
+      if(thisMap.get(1,6))sum-=75;
+    }
+    if(restMap.get(7,0)){
+      if(thisMap.get(7,1))sum-=25;
+      if(thisMap.get(6,0))sum-=25; 
+      if(thisMap.get(6,1))sum-=75;
+    }
+    if(restMap.get(7,7)){
+      if(thisMap.get(6,7))sum-=25;
+      if(thisMap.get(7,6))sum-=25;
+      if(thisMap.get(6,6))sum-=75;
+    }
+    sum+=this->getMoves(c).size()*50;
+    sum-=cnt*15; // learn to fake
+    if(!cnt)sum=-114514;
+    c^=1;
+    res+=t?-sum:sum;
+  }
   return res;
-}
-int judge(const Board &board,bit c){
-  int res=0;
-  res+=judgeByMapWeight(board,c)*100;
-  return res;
-}
-
-inline int Board::judge(bit col)const{
-  return ::judge(*this,col);
 }
 inline int Movement::judge(Board board,bit col){
   board.move(col,this->move);
-  return this->value=::judge(board,col);
+  return this->value=board.judge(col);
 }
 
 // Function: Alpha-Beta Search
 namespace AlphaBetaSearch{
-  const int DepthLimit=50;
+  const int DepthLimit=64;
   const int WeightInf=1e9;
   Board board;
   bit col;
@@ -250,12 +259,22 @@ namespace AlphaBetaSearch{
       return moves.back().move;
     }
   }
+  
+  int randomChoose(){
+    vec<int> moves=board.getMoves(col);
+    if(!moves.size()){
+      return -1;
+    }else{
+      return moves[rand(0,(int)moves.size()-1)];
+    }
+  }
 
   void finishSearch(int ans){
     if(board.checkMove(col,ans)){
       callback(ans);
     }else{
-      callback(bruteForce());
+      log("[error] Illegal moves!!! (move=%d)",ans);
+      callback(rand(0,2)?bruteForce():randomChoose());
     }
     exit(0);
   }
@@ -266,7 +285,7 @@ namespace AlphaBetaSearch{
       return finishSearch(ans.fir),0;
     }
     if(step>maxDepth){
-      return judge(board,mycol);
+      return board.judge(mycol);
     }
 
     pair<int,int> best(-1,-WeightInf);
@@ -322,6 +341,10 @@ namespace AlphaBetaSearch{
     if(!board.getMoves(col).size()){
       log("[alpha-beta] no moves at all!");
       return finishSearch(-1);
+    }
+
+    if(board.map[0].count()<=3&&board.map[1].count()<=3){
+      return finishSearch(randomChoose());
     }
 
     ans=make_pair(-1,-WeightInf);
