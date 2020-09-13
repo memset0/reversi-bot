@@ -374,40 +374,26 @@ inline int Board::judgeSide(bit c)const{
   if(!cnt)return -20040725;
   //边角定权
   res+=this->map[c].intersection(Judger::corner)*1000;
-  res-=this->map[c].intersection(Judger::x_squares)*50;
-  res-=this->map[c].intersection(Judger::c_squares)*20;
+  res-=this->map[c].intersection(Judger::x_squares)*250;
+  res-=this->map[c].intersection(Judger::c_squares)*50;
   //行动力
   int mov=this->getMoveSize(c);
-  res+=mov*40;
-  // if(!mov)res-=800;
+  res+=mov*20;
+  if(!mov)res-=800;
   //稳定子
-  // int sta=this->getStableSize(c);
-  // res+=sta*50;
-  // if(sta>=32)res=20040725;
+  int sta=this->getStableSize(c);
+  res+=sta*40;
+  if(sta>=32)return 20040725;
   //占子策略
   if(JudgeStatus==1){
     res-=cnt*10;
   }else if(JudgeStatus==2){
-    res+=cnt*15;
+    res+=cnt*25;
   }
   return res;
 }
 inline int Board::judge(bit c)const{
-  int res=this->judgeSide(c)-this->judgeSide(c^1)+(fakeRng()%5);
-  // if(res>4000){
-  //   this->output();
-  //   log(">>> JUDGE %d | %d %d\n",res,this->judgeSide(c),this->judgeSide(c^1));
-  //   log("%d %d %d\n",
-  //     this->map[c].intersection(Judger::corner),
-  //     this->map[c].intersection(Judger::x_squares),
-  //     this->map[c].intersection(Judger::c_squares));
-  //   log("%d %d %d\n",
-  //     this->map[c^1].intersection(Judger::corner),
-  //     this->map[c^1].intersection(Judger::x_squares),
-  //     this->map[c^1].intersection(Judger::c_squares));
-  //   exit(0);
-  // }
-  return res;
+  return this->judgeSide(c)-this->judgeSide(c^1)+(fakeRng()%9-4);
 }
 inline int Movement::judge(Board board,bit col){
   board.move(col,this->move);
@@ -465,7 +451,7 @@ namespace AlphaBetaSearch{
     if(!(++tick&1023)&&1.0*clock()/CLOCKS_PER_SEC>0.95){
       return finishSearch(ans.fir),0;
     }
-    if(step>=maxDepth){
+    if(step>maxDepth){
       return board.judge(mycol);
     }
 
@@ -522,9 +508,9 @@ namespace AlphaBetaSearch{
       log("[alpha-beta] no moves at all!");
       return finishSearch(-1);
     }
-    // if(board.map[col].count()<=3&&board.map[col^1].count()<=5){
-    //   return finishSearch(randomChoose());
-    // }
+    if(board.map[col].count()<=3&&board.map[col^1].count()<=5){
+      return finishSearch(randomChoose());
+    }
 
     ans=make_pair(-1,-WeightInf);
     for(maxDepth=3;maxDepth<16;maxDepth++){
