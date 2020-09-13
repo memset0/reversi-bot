@@ -370,13 +370,35 @@ inline void Board::move(bit c,int u){
 // Function: Judge
 int JudgeStatus=1;
 inline int Board::judgeSide(bit c,int mov)const{
+  static constexpr int corner_pt=2000;
+  static constexpr int x_squares_pt=-1100;
+  static constexpr int c_squares_pt=-600;
   int res=0;
   int cnt=this->map[c].count();
   if(!cnt)return -20040725;
+  Map rest=-1ull^this->map[0].source()^this->map[1].source();
   //边角定权
-  res+=this->map[c].intersection(Judger::corner)*2000;
-  res-=this->map[c].intersection(Judger::x_squares)*1100;
-  res-=this->map[c].intersection(Judger::c_squares)*600;
+  res+=this->map[c].intersection(Judger::corner)*corner_pt;
+  if(rest.get(0,0)){
+    if(this->map[c].get(1,0))res+=c_squares_pt;
+    if(this->map[c].get(0,1))res+=c_squares_pt;
+    if(this->map[c].get(1,1))res+=x_squares_pt;
+  }
+  if(rest.get(0,7)){
+    if(this->map[c].get(0,6))res+=c_squares_pt;
+    if(this->map[c].get(1,7))res+=c_squares_pt;
+    if(this->map[c].get(1,6))res+=x_squares_pt;
+  }
+  if(rest.get(7,0)){
+    if(this->map[c].get(6,0))res+=c_squares_pt;
+    if(this->map[c].get(7,1))res+=c_squares_pt;
+    if(this->map[c].get(6,1))res+=x_squares_pt;
+  }
+  if(rest.get(7,7)){
+    if(this->map[c].get(6,7))res+=c_squares_pt;
+    if(this->map[c].get(7,6))res+=c_squares_pt;
+    if(this->map[c].get(6,6))res+=x_squares_pt;
+  }
   //行动力
   res+=mov*20;
   if(!mov)res-=200;
