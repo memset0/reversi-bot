@@ -320,7 +320,7 @@ inline bit Board::checkMove(bit c,int now)const{
   if(!moves){
     return now==-1;
   }else{
-    return u64ToVec(moves).includes(now);
+    return (moves>>now)&1;
   }
 }
 
@@ -328,7 +328,7 @@ inline bit Board::checkMove(bit c,int now)const{
 inline u64 Board::getStable(bit c)const{
   u64 res=0;
   for(int i=0;i<64;i++)
-    if(subset(Judger::stable[i][0],this->map[c].a)|| 
+    if(subset(Judger::stable[i][0],(this->map[0].a|this->map[1].a))|| 
        subset(Judger::stable[i][1],this->map[c].a)||
        subset(Judger::stable[i][2],this->map[c].a)||
        subset(Judger::stable[i][3],this->map[c].a)||
@@ -400,8 +400,10 @@ inline int Board::judgeSide(bit c,int mov)const{
     if(this->map[c].get(6,6))res+=x_squares_pt;
   }
   //行动力
-  res+=mov*20;
+  res+=mov*30;
   if(!mov)res-=200;
+  if(mov==1)res-=100;
+  if(mov==2)res-=50;
   //稳定子
   int sta=this->getStableSize(c);
   res+=sta*40;
@@ -478,7 +480,7 @@ namespace AlphaBetaSearch{
 
   int search(const Board &board,int step,int alpha,int beta){
     bit mycol=col^(step&1);
-    if(!(++tick&1023)&&clock()/(double)CLOCKS_PER_SEC>0.95){
+    if(!(++tick&1023)&&clock()/(double)CLOCKS_PER_SEC>0.96){
       return finishSearch(ans.fir),0;
     }
     if(step>maxDepth){
@@ -499,11 +501,11 @@ namespace AlphaBetaSearch{
       return stackValue[step][x]>stackValue[step][y];
     });
 
-    bool flagMW=false; // min window cut down flag
+    bool flagPVS=false; // Principal Variation Search
     for(int i:ord){
       const Board &next=stackBoard[step][i];
       int val;
-      if(flagMW){
+      if(flagPVS){
         val=-search(next,step+1,-alpha-1,-alpha);
         if(val>alpha&&val<beta){
           val=-search(next,step+1,-beta,-alpha);
@@ -515,12 +517,8 @@ namespace AlphaBetaSearch{
       if(val>alpha){
         alpha=val;
         best=make_pair(i,val);
-        flagMW=true;
+        flagPVS=true;
       }
-      // if(step<=1){
-      //   for(int i=0;i<step;i++)log("    ");
-      //   log("[%d] (%d,%d) val=%d alpha=%d beta=%d score=%d\n",step,idx(i),idy(i),val,alpha,beta,stackValue[step][i]);
-      // }
     }
     if(!moves){
       int val=-search(board,step+1,-beta,-alpha);
@@ -591,7 +589,7 @@ int main(){
   log("[bot] color=%d\n",col);
 
   AlphaBetaSearch::solve(board,col,[&](int movement){
-    log("[bot] finished.\n");
+    log("[bot] finished. (clock=%.6lf)\n",clock()/(double)CLOCKS_PER_SEC);
     if(~movement){
       cout<<idx(movement)<<" "<<idy(movement)<<endl;
     }else{
