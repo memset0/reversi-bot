@@ -1,3 +1,9 @@
+judger
+others-example
+*.in
+*.out
+.DS_Store
+
 # Prerequisites
 *.d
 
