@@ -30,8 +30,10 @@ namespace Judger{
 // Tools: Debug
 #ifdef memset0
   #define log(...) fprintf(stderr,__VA_ARGS__)
+  #define debug(...) fprintf(stderr,__VA_ARGS__)
 #else
   #define log(...) void(0)
+  #define debug(...) fprintf(stderr,__VA_ARGS__)
 #endif
 
 // Tools: rng
@@ -51,7 +53,7 @@ inline u32 fakeRng(){
 #define subset(x,y) (((x)&(y))==(x))
 
 // Tools: Helper Libs
-template<typename... Args> string string_sprintf(const char* format,Args... args) {
+template<typename... Args> string string_sprintf(const char* format,Args... args){
   int length=snprintf(nullptr,0,format,args...);
 #ifdef memset0
   assert(length>=0);
@@ -66,6 +68,7 @@ template<typename... Args> string string_sprintf(const char* format,Args... args
 // Class: Vector
 template<class T> struct vec:vector<T>{
   using vector<T>::vector;
+  
   inline vec<T> slice(int l,int r)const{return vec(this->begin()+l,this->begin()+r);}
   inline vec<T> concat(const vec<T> &rhs){this->insert(this->end(),rhs.begin(),rhs.end());}
   inline T random_item(){return this->operator[](rand(0,(int)this->size()-1));}
@@ -77,6 +80,12 @@ template<class T> struct vec:vector<T>{
   template<class TT> inline vec<TT> map(const function<TT(T)> &func){
     vec<TT> res;
     for(const auto &it:*this)res.push_back(func(it));
+    return res;
+  }
+
+  inline static vec<int> from(u64 sta){
+    vec<int> res;
+    for(int i=0;i<64;i++)if((sta>>i)&1)res.push_back(i);
     return res;
   }
 };
@@ -97,13 +106,23 @@ template<class T> string to_string(const vec<T> &v,function<string(T)> custom){
   return "{"+res+"}";
 }
 
+// Lib
+inline string u64ToHex(u64 value){
+  return string_sprintf("0x%08X%08X",value>>32,value&(-1u));
+}
+inline vec<int> u64ToVec(u64 source){
+  vec<int> target;
+  for(int i=0;i<64;i++)if((source>>i)&1)target.push_back(i);
+  return target;
+}
+
 // Class: Map
 struct Map{
   u64 a;
 
   inline u64 source()const{return a;}
   inline int count()const{return popcnt(a);}
-  inline int intersection(u64 rhs)const{return popcnt(a^rhs);}
+  inline int intersection(u64 rhs)const{return popcnt(a&rhs);}
 
   inline void set(){a=-1ull;}
   inline void reset(){a=0;}
@@ -129,17 +148,18 @@ struct Map{
 struct Board{
   Map map[2];
 
-  inline vec<int> getMoves(bit)const;
-  inline int getMovesSize(bit)const;
+  inline u64 getMove(bit)const;
+  inline int getMoveSize(bit)const;
   inline bit checkMove(bit,int)const;
 
-  inline vec<int> getStable(bit)const;
+  inline u64 getStable(bit)const;
   inline int getStableSize(bit)const;
 
   inline void move(bit,int);
   inline void move(bit,int,int);
 
   inline int judge(bit)const;
+  inline int judgeSide(bit)const;
 
   inline void reverse(){swap(map[0],map[1]);}
 
@@ -174,7 +194,6 @@ struct Movement{
   inline bool operator<(const Movement &rhs)const{return value<rhs.value;}
   inline bool operator==(const Movement &rhs)const{return value==rhs.value;}
 
-  Movement(int move):move(move){}
   Movement(int move,int value):move(move),value(value){}
   Movement(int move,Board board,bit col):move(move){board.move(col,move),value=board.judge(col);}
 };
@@ -183,9 +202,6 @@ struct Movement{
 namespace Judger{
   constexpr int nxt[8][2]={{1,0},{0,1},{-1,0},{0,-1},{1,1},{-1,-1},{1,-1},{-1,1}};
 
-  inline string u64ToHex(u64 value){
-    return string_sprintf("0x%08X%08X",value>>32,value&(-1u));
-  }
   struct MagicNumber{
     string name,type,plain;
     inline MagicNumber(string base,u64 value):type("u64"){
@@ -279,9 +295,8 @@ void init(){
 }
 
 // Function: get all moves
-inline vec<int> Board::getMoves(bit c)const{
-  // log("Board::getMoves(%d)\n",c),this->output();
-  vec<int> res;
+inline u64 Board::getMove(bit c)const{
+  u64 res=0;
   for(int i=0;i<64;i++)
     if(!map[c].get(i)&&!map[c^1].get(i)){
       bit fl=0;
@@ -292,37 +307,46 @@ inline vec<int> Board::getMoves(bit c)const{
             if(!map[c^1].get(j))break;
           }
         }
-      if(fl)res.push_back(i);
+      if(fl)res|=1ull<<i;
     }
   return res;
 }
-inline int Board::getMovesSize(bit c)const{
-  return this->getMoves(c).size();
+inline int Board::getMoveSize(bit c)const{
+  return popcnt(this->getMove(c));
 }
 inline bit Board::checkMove(bit c,int now)const{
-  vec<int> moves=this->getMoves(c);
-  if(!moves.size()){
+  u64 moves=this->getMove(c);
+  if(!moves){
     return now==-1;
   }else{
-    return moves.includes(now);
+    return u64ToVec(moves).includes(now);
   }
 }
 
 // Function: get stable chess
-inline vec<int> Board::getStable(bit c)const{
-  vec<int> res;
+inline u64 Board::getStable(bit c)const{
+  u64 res=0;
   for(int i=0;i<64;i++)
     if(subset(Judger::stable[i][0],this->map[c].a)|| 
        subset(Judger::stable[i][1],this->map[c].a)||
        subset(Judger::stable[i][2],this->map[c].a)||
        subset(Judger::stable[i][3],this->map[c].a)||
        subset(Judger::stable[i][4],this->map[c].a)){
-      res.push_back(i);
+      res|=1ull<<i;
     }
   return res;
 }
 inline int Board::getStableSize(bit c)const{
-  return getStable(c).size();
+  int cnt=0;
+  for(int i=0;i<64;i++)
+    if(subset(Judger::stable[i][0],this->map[c].a)|| 
+       subset(Judger::stable[i][1],this->map[c].a)||
+       subset(Judger::stable[i][2],this->map[c].a)||
+       subset(Judger::stable[i][3],this->map[c].a)||
+       subset(Judger::stable[i][4],this->map[c].a)){
+      ++cnt;
+    }
+  return cnt;
 }
 
 // Function: play a movement
@@ -334,41 +358,56 @@ inline void Board::move(bit c,int u){
     for(int t=0;t<(int)walk[u][w].size();t++){
       int v=walk[u][w][t];
       if(this->map[c].get(v)){
-        u64 path=walkpath[u][w][t];
-        this->map[c].a^=path;
-        this->map[c^1].a^=path;
+        this->map[c].a^=walkpath[u][w][t];
+        this->map[c^1].a^=walkpath[u][w][t];
         break;
       }
       if(!this->map[c^1].get(v))break;
     }
-  // log("Board::move(%d,%d)\n",idx(u),idy(u)),this->output();
 }
 
 // Function: Judge
-inline int Board::judge(bit c)const{
+int JudgeStatus=1;
+inline int Board::judgeSide(bit c)const{
   int res=0;
-  Map restMap=~(this->map[0].source()|this->map[1].source());
-  int restCnt=restMap.count();
-  for(int t=0;t<2;t++,c^=1){
-    const Map &thisMap=this->map[c];
-    int sum=0,cnt=thisMap.count();
-    //边角定权
-    sum+=thisMap.intersection(Judger::corner)*1000;
-    sum-=thisMap.intersection(Judger::x_squares)*-100;
-    sum-=thisMap.intersection(Judger::c_squares)*-60;
-    //行动力
-    sum+=this->getMoves(c).size()*30;
-    //稳定子
-    sum+=this->getStable(c).size()*150;
-    //前期放弃走过多子
-    if(restCnt>32)sum-=cnt*10;
-    if(restCnt>48)sum-=cnt*20; // fake
-    //无解特判
-    if(!cnt)sum=-20040725;
-    //贡献答案
-    res+=t?-sum:sum;
+  int cnt=this->map[c].count();
+  if(!cnt)return -20040725;
+  //边角定权
+  res+=this->map[c].intersection(Judger::corner)*1000;
+  res-=this->map[c].intersection(Judger::x_squares)*50;
+  res-=this->map[c].intersection(Judger::c_squares)*20;
+  //行动力
+  int mov=this->getMoveSize(c);
+  res+=mov*40;
+  // if(!mov)res-=800;
+  //稳定子
+  // int sta=this->getStableSize(c);
+  // res+=sta*50;
+  // if(sta>=32)res=20040725;
+  //占子策略
+  if(JudgeStatus==1){
+    res-=cnt*10;
+  }else if(JudgeStatus==2){
+    res+=cnt*15;
   }
-  return res+(fakeRng()&7);
+  return res;
+}
+inline int Board::judge(bit c)const{
+  int res=this->judgeSide(c)-this->judgeSide(c^1)+(fakeRng()%5);
+  // if(res>4000){
+  //   this->output();
+  //   log(">>> JUDGE %d | %d %d\n",res,this->judgeSide(c),this->judgeSide(c^1));
+  //   log("%d %d %d\n",
+  //     this->map[c].intersection(Judger::corner),
+  //     this->map[c].intersection(Judger::x_squares),
+  //     this->map[c].intersection(Judger::c_squares));
+  //   log("%d %d %d\n",
+  //     this->map[c^1].intersection(Judger::corner),
+  //     this->map[c^1].intersection(Judger::x_squares),
+  //     this->map[c^1].intersection(Judger::c_squares));
+  //   exit(0);
+  // }
+  return res;
 }
 inline int Movement::judge(Board board,bit col){
   board.move(col,this->move);
@@ -377,21 +416,22 @@ inline int Movement::judge(Board board,bit col){
 
 // Function: Alpha-Beta Search
 namespace AlphaBetaSearch{
-  const int DepthLimit=64;
   const int WeightInf=1e9;
   Board board;
   bit col;
   int maxDepth;
-  u32 tickCounter;
+  u32 tick;
   function<void(int)> callback;
 
   pair<int,int> ans;
-  vec<int> stack[DepthLimit];
+  int stackValue[64][64];
+  Board stackBoard[64][64];
 
   int bruteForce(){
-    vec<Movement> moves=board.getMoves(col).map((function<Movement(int)>)[&](int move){
-      return Movement(move,board,col);
-    });
+    vec<Movement> moves=u64ToVec(board.getMove(col))
+      .map((function<Movement(int)>)[&](int move){
+        return Movement(move,board,col);
+      });
     if(!moves.size()){
       return -1;
     }else{
@@ -401,7 +441,7 @@ namespace AlphaBetaSearch{
   }
   
   int randomChoose(){
-    vec<int> moves=board.getMoves(col);
+    vec<int> moves=u64ToVec(board.getMove(col));
     if(!moves.size()){
       return -1;
     }else{
@@ -409,11 +449,12 @@ namespace AlphaBetaSearch{
     }
   }
 
-  void finishSearch(int ans){
-    if(board.checkMove(col,ans)){
-      callback(ans);
+  void finishSearch(int movement){
+    debug("[alpha-beta] maxDepth=%d answerWeight=%d\n",maxDepth,ans.sec);
+    if(board.checkMove(col,movement)){
+      callback(movement);
     }else{
-      log("[error] Illegal moves!!! (move=%d)",ans);
+      debug("[error] Illegal moves!!! (move=%d)",movement);
       callback(rand(0,2)?bruteForce():randomChoose());
     }
     exit(0);
@@ -421,32 +462,30 @@ namespace AlphaBetaSearch{
 
   int alphaBetaSearch(const Board &board,int step,int alpha,int beta){
     bit mycol=col^(step&1);
-    if((++tickCounter&1023)==0&&1.0*clock()/CLOCKS_PER_SEC>0.95){
+    if(!(++tick&1023)&&1.0*clock()/CLOCKS_PER_SEC>0.95){
       return finishSearch(ans.fir),0;
     }
-    if(step>maxDepth){
+    if(step>=maxDepth){
       return board.judge(mycol);
     }
 
+    vec<int> ord;
     pair<int,int> best(-1,-WeightInf);
-    vec<pair<Movement,Board>> data=board.getMoves(mycol)
-      .map((function<pair<Movement,Board>(int)>)[&](int move){
-        Board nextBoard=board;
-        nextBoard.move(mycol,move);
-        int value=nextBoard.judge(mycol);
-        return make_pair(Movement(move,value),nextBoard);
-      });
-    sort(all(data),[](const auto &a,const auto &b){
-      return a.fir.value>b.fir.value;
+
+    u64 moves=board.getMove(mycol);
+    for(int i=0;i<64;i++)if((moves>>i)&1){
+      ord.push_back(i);
+      stackBoard[step][i]=board;
+      stackBoard[step][i].move(mycol,i);
+      stackValue[step][i]=stackBoard[step][i].judge(mycol);
+    }
+    sort(ord.begin(),ord.end(),[&](int x,int y){
+      return stackValue[step][x]>stackValue[step][y];
     });
-    stack[step]=data
-      .map((function<int(pair<Movement,Board>)>)[&](const pair<Movement,Board> &data){
-        return data.fir.move;
-      });
 
     bool slideWindowFlag=false;
-    for(const auto &it:data){
-      const Board &next=it.sec;
+    for(int i:ord){
+      const Board &next=stackBoard[step][i];
       int val;
       if(slideWindowFlag){
         val=-alphaBetaSearch(next,step+1,-alpha-1,-alpha);
@@ -459,18 +498,18 @@ namespace AlphaBetaSearch{
       if(val>=beta)return val;
       if(val>alpha){
         alpha=val;
-        best=make_pair(it.fir.move,val);
+        best=make_pair(i,val);
         slideWindowFlag=true;
       }
     }
-    if(data.empty()){
+    if(!moves){
       int val=-alphaBetaSearch(board,step+1,-beta,-alpha);
       if(val>=beta)return val;
       if(val>alpha){
         alpha=val;
         best=make_pair(-1,val);
       }
-    } 
+    }
 
     if(!step)ans=best;
     return alpha;
@@ -479,19 +518,19 @@ namespace AlphaBetaSearch{
   void solve(const Board &_board,bit _col,function<void(int)> _callback){
     board=_board,col=_col,callback=_callback;
 
-    if(!board.getMoves(col).size()){
+    if(!board.getMove(col)){
       log("[alpha-beta] no moves at all!");
       return finishSearch(-1);
     }
-    if(board.map[col].count()<=3&&board.map[col^1].count()<=5){
-      return finishSearch(randomChoose());
-    }
+    // if(board.map[col].count()<=3&&board.map[col^1].count()<=5){
+    //   return finishSearch(randomChoose());
+    // }
 
     ans=make_pair(-1,-WeightInf);
-    for(maxDepth=2;maxDepth<DepthLimit;maxDepth++){
+    for(maxDepth=3;maxDepth<16;maxDepth++){
       alphaBetaSearch(board,0,-WeightInf,WeightInf);
       Movement ansMovement(ans.fir,board,col);
-      log("ans=[%d %d] : x=%d y=%d value=%d\n",ans.fir,ans.sec,idx(ans.fir),idy(ans.fir),ansMovement.value);
+      debug("ans=[%d %d] : x=%d y=%d value=%d\n",ans.fir,ans.sec,idx(ans.fir),idy(ans.fir),ansMovement.value);
     }
     finishSearch(ans.fir);
   }
@@ -503,31 +542,36 @@ namespace AlphaBetaSearch{
 int main(){
 #ifdef memset0
   freopen("testinput.in","r",stdin);
-  Judger::build();
+  // Judger::build();
 #endif
+  log("[bot] start!\n");
   for(int t=rand(0,233);t--;)fakeRng();
   init();
 
   Board board;
-  bit col=0;
   board.map[0].set(3,3),board.map[0].set(4,4);
   board.map[1].set(3,4),board.map[1].set(4,3);
 
   int n;
   vec<pair<int,int>> go;  
   cin>>n;
+  if(n>23){
+    JudgeStatus=2;
+  }
+
   go.resize((n<<1)-1);
   for(int i=0;i<(int)go.size();i++){
     cin>>go[i].fir>>go[i].sec;
-    if(!i)col=go.front().fir==-1&&go.front().sec==-1;
+  }
+  bit col=go.front().fir==-1&&go.front().sec==-1;
+  for(int i=0;i<(int)go.size();i++)
     if(~go[i].fir&&~go[i].sec){
       board.move((i&1)^col^1,go[i].fir,go[i].sec);
     }
-  }
-  log("color=%d\n",col);
+  log("[bot] color=%d\n",col);
 
   AlphaBetaSearch::solve(board,col,[&](int movement){
-    log("[bot] `callback` has been called!\n");
+    log("[bot] finished.\n");
     if(~movement){
       cout<<idx(movement)<<" "<<idy(movement)<<endl;
     }else{
