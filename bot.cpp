@@ -159,7 +159,8 @@ struct Board{
   inline void move(bit,int,int);
 
   inline int judge(bit)const;
-  inline int judgeSide(bit)const;
+  inline int judgeSide(bit,int)const;
+  inline int judgeFinal(bit)const;
 
   inline void reverse(){swap(map[0],map[1]);}
 
@@ -343,7 +344,7 @@ inline int Board::getStableSize(bit c)const{
        subset(Judger::stable[i][1],this->map[c].a)||
        subset(Judger::stable[i][2],this->map[c].a)||
        subset(Judger::stable[i][3],this->map[c].a)||
-       subset(Judger::stable[i][4],this->map[c].a)){
+       subset(Judger::stable[i][4],this->map[c].a)){  
       ++cnt;
     }
   return cnt;
@@ -368,18 +369,17 @@ inline void Board::move(bit c,int u){
 
 // Function: Judge
 int JudgeStatus=1;
-inline int Board::judgeSide(bit c)const{
+inline int Board::judgeSide(bit c,int mov)const{
   int res=0;
   int cnt=this->map[c].count();
   if(!cnt)return -20040725;
   //边角定权
-  res+=this->map[c].intersection(Judger::corner)*600;
-  res-=this->map[c].intersection(Judger::x_squares)*200;
-  res-=this->map[c].intersection(Judger::c_squares)*50;
+  res+=this->map[c].intersection(Judger::corner)*2000;
+  res-=this->map[c].intersection(Judger::x_squares)*1100;
+  res-=this->map[c].intersection(Judger::c_squares)*600;
   //行动力
-  int mov=this->getMoveSize(c);
   res+=mov*20;
-  if(!mov)res-=800;
+  if(!mov)res-=200;
   //稳定子
   int sta=this->getStableSize(c);
   res+=sta*40;
@@ -392,8 +392,16 @@ inline int Board::judgeSide(bit c)const{
   }
   return res;
 }
+inline int Board::judgeFinal(bit c)const{
+  int cnt[]={this->map[0].count(),this->map[1].count()};
+  return cnt[0]==cnt[1]?0:((cnt[c]>cnt[c^1]?20040725:-20040725)<<1);
+}
 inline int Board::judge(bit c)const{
-  return this->judgeSide(c)-this->judgeSide(c^1)+(fakeRng()%9-4);
+  int mov[]={this->getMoveSize(0),this->getMoveSize(1)};
+  if(!mov[0]&&!mov[1]){
+    return this->judgeFinal(c);
+  }
+  return this->judgeSide(c,mov[c])-this->judgeSide(c^1,mov[c^1])+(fakeRng()%9-4);
 }
 inline int Movement::judge(Board board,bit col){
   board.move(col,this->move);
@@ -402,7 +410,7 @@ inline int Movement::judge(Board board,bit col){
 
 // Function: Alpha-Beta Search
 namespace AlphaBetaSearch{
-  const int WeightInf=1e9;
+  const int INFW=1e9;
   Board board;
   bit col;
   int maxDepth;
@@ -446,9 +454,9 @@ namespace AlphaBetaSearch{
     exit(0);
   }
 
-  int alphaBetaSearch(const Board &board,int step,int alpha,int beta){
+  int search(const Board &board,int step,int alpha,int beta){
     bit mycol=col^(step&1);
-    if(!(++tick&1023)&&1.0*clock()/CLOCKS_PER_SEC>0.95){
+    if(!(++tick&1023)&&clock()/(double)CLOCKS_PER_SEC>0.95){
       return finishSearch(ans.fir),0;
     }
     if(step>maxDepth){
@@ -456,7 +464,7 @@ namespace AlphaBetaSearch{
     }
 
     vec<int> ord;
-    pair<int,int> best(-1,-WeightInf);
+    pair<int,int> best(-1,-INFW);
 
     u64 moves=board.getMove(mycol);
     for(int i=0;i<64;i++)if((moves>>i)&1){
@@ -469,27 +477,31 @@ namespace AlphaBetaSearch{
       return stackValue[step][x]>stackValue[step][y];
     });
 
-    bool slideWindowFlag=false;
+    bool flagMW=false; // min window cut down flag
     for(int i:ord){
       const Board &next=stackBoard[step][i];
       int val;
-      if(slideWindowFlag){
-        val=-alphaBetaSearch(next,step+1,-alpha-1,-alpha);
+      if(flagMW){
+        val=-search(next,step+1,-alpha-1,-alpha);
         if(val>alpha&&val<beta){
-          val=-alphaBetaSearch(next,step+1,-beta,-alpha);
+          val=-search(next,step+1,-beta,-alpha);
         }
       }else{
-        val=-alphaBetaSearch(next,step+1,-beta,-alpha);
+        val=-search(next,step+1,-beta,-alpha);
       }
       if(val>=beta)return val;
       if(val>alpha){
         alpha=val;
         best=make_pair(i,val);
-        slideWindowFlag=true;
+        flagMW=true;
       }
+      // if(step<=1){
+      //   for(int i=0;i<step;i++)log("    ");
+      //   log("[%d] (%d,%d) val=%d alpha=%d beta=%d score=%d\n",step,idx(i),idy(i),val,alpha,beta,stackValue[step][i]);
+      // }
     }
     if(!moves){
-      int val=-alphaBetaSearch(board,step+1,-beta,-alpha);
+      int val=-search(board,step+1,-beta,-alpha);
       if(val>=beta)return val;
       if(val>alpha){
         alpha=val;
@@ -512,9 +524,9 @@ namespace AlphaBetaSearch{
       return finishSearch(randomChoose());
     }
 
-    ans=make_pair(-1,-WeightInf);
-    for(maxDepth=3;maxDepth<16;maxDepth++){
-      alphaBetaSearch(board,0,-WeightInf,WeightInf);
+    ans=make_pair(-1,-INFW);
+    for(maxDepth=3;maxDepth<64;maxDepth++){
+      search(board,0,-INFW,INFW);
       Movement ansMovement(ans.fir,board,col);
       debug("ans=[%d %d] : x=%d y=%d value=%d\n",ans.fir,ans.sec,idx(ans.fir),idy(ans.fir),ansMovement.value);
     }
