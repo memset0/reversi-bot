@@ -339,7 +339,7 @@ inline u64 Board::getStable(bit c)const{
 inline int Board::getStableSize(bit c)const{
   int cnt=0;
   for(int i=0;i<64;i++)
-    if(subset(Judger::stable[i][0],this->map[c].a)|| 
+    if(subset(Judger::stable[i][0],(this->map[0].a|this->map[1].a))|| 
        subset(Judger::stable[i][1],this->map[c].a)||
        subset(Judger::stable[i][2],this->map[c].a)||
        subset(Judger::stable[i][3],this->map[c].a)||
@@ -373,8 +373,8 @@ inline int Board::judgeSide(bit c)const{
   int cnt=this->map[c].count();
   if(!cnt)return -20040725;
   //边角定权
-  res+=this->map[c].intersection(Judger::corner)*1000;
-  res-=this->map[c].intersection(Judger::x_squares)*250;
+  res+=this->map[c].intersection(Judger::corner)*600;
+  res-=this->map[c].intersection(Judger::x_squares)*200;
   res-=this->map[c].intersection(Judger::c_squares)*50;
   //行动力
   int mov=this->getMoveSize(c);
@@ -388,7 +388,7 @@ inline int Board::judgeSide(bit c)const{
   if(JudgeStatus==1){
     res-=cnt*10;
   }else if(JudgeStatus==2){
-    res+=cnt*25;
+    res+=cnt*30+sta*20;
   }
   return res;
 }
@@ -541,7 +541,7 @@ int main(){
   int n;
   vec<pair<int,int>> go;  
   cin>>n;
-  if(n>23){
+  if(n>16){
     JudgeStatus=2;
   }
 
