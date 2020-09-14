@@ -19,12 +19,17 @@ using i64=long long;
 using u32=unsigned int;
 using u64=unsigned long long;
 
+// Const Value
+enum WAY{E,W,S,N,SW,NE,SE,NW};
+constexpr int nxt[8][2]={{0,1},{0,-1},{1,0},{-1,0},{1,1},{-1,-1},{1,-1},{-1,1}};
+
 // auto generated
 namespace Judger{
-  const u64 corner=0x8100000000000081;
-  const u64 x_squares=0x0042000000004200;
-  const u64 c_squares=0x4281000000008142;
-  const u64 stable[64][5]={{0x81412111090503FF,0x0000000000000001,0x00000000000000FF,0x0101010101010101,0xFFFFFFFFFFFFFFFF},{0x02824222120A07FF,0x0000000000000003,0x00000000000000FE,0x0303030303030303,0xFEFEFEFEFEFEFEFE},{0x0404844424150EFF,0x0000000000000007,0x00000000000000FC,0x0707070707070707,0xFCFCFCFCFCFCFCFC},{0x08080888492A1CFF,0x000000000000000F,0x00000000000000F8,0x0F0F0F0F0F0F0F0F,0xF8F8F8F8F8F8F8F8},{0x10101011925438FF,0x000000000000001F,0x00000000000000F0,0x1F1F1F1F1F1F1F1F,0xF0F0F0F0F0F0F0F0},{0x2020212224A870FF,0x000000000000003F,0x00000000000000E0,0x3F3F3F3F3F3F3F3F,0xE0E0E0E0E0E0E0E0},{0x404142444850E0FF,0x000000000000007F,0x00000000000000C0,0x7F7F7F7F7F7F7F7F,0xC0C0C0C0C0C0C0C0},{0x8182848890A0C0FF,0x00000000000000FF,0x0000000000000080,0xFFFFFFFFFFFFFFFF,0x8080808080808080},{0x412111090503FF03,0x0000000000000101,0x000000000000FFFF,0x0101010101010100,0xFFFFFFFFFFFFFF00},{0x824222120A07FF07,0x0000000000000303,0x000000000000FEFE,0x0303030303030300,0xFEFEFEFEFEFEFE00},{0x04844424150EFF0E,0x0000000000000707,0x000000000000FCFC,0x0707070707070700,0xFCFCFCFCFCFCFC00},{0x080888492A1CFF1C,0x0000000000000F0F,0x000000000000F8F8,0x0F0F0F0F0F0F0F00,0xF8F8F8F8F8F8F800},{0x101011925438FF38,0x0000000000001F1F,0x000000000000F0F0,0x1F1F1F1F1F1F1F00,0xF0F0F0F0F0F0F000},{0x20212224A870FF70,0x0000000000003F3F,0x000000000000E0E0,0x3F3F3F3F3F3F3F00,0xE0E0E0E0E0E0E000},{0x4142444850E0FFE0,0x0000000000007F7F,0x000000000000C0C0,0x7F7F7F7F7F7F7F00,0xC0C0C0C0C0C0C000},{0x82848890A0C0FFC0,0x000000000000FFFF,0x0000000000008080,0xFFFFFFFFFFFFFF00,0x8080808080808000},{0x2111090503FF0305,0x0000000000010101,0x0000000000FFFFFF,0x0101010101010000,0xFFFFFFFFFFFF0000},{0x4222120A07FF070A,0x0000000000030303,0x0000000000FEFEFE,0x0303030303030000,0xFEFEFEFEFEFE0000},{0x844424150EFF0E15,0x0000000000070707,0x0000000000FCFCFC,0x0707070707070000,0xFCFCFCFCFCFC0000},{0x0888492A1CFF1C2A,0x00000000000F0F0F,0x0000000000F8F8F8,0x0F0F0F0F0F0F0000,0xF8F8F8F8F8F80000},{0x1011925438FF3854,0x00000000001F1F1F,0x0000000000F0F0F0,0x1F1F1F1F1F1F0000,0xF0F0F0F0F0F00000},{0x212224A870FF70A8,0x00000000003F3F3F,0x0000000000E0E0E0,0x3F3F3F3F3F3F0000,0xE0E0E0E0E0E00000},{0x42444850E0FFE050,0x00000000007F7F7F,0x0000000000C0C0C0,0x7F7F7F7F7F7F0000,0xC0C0C0C0C0C00000},{0x848890A0C0FFC0A0,0x0000000000FFFFFF,0x0000000000808080,0xFFFFFFFFFFFF0000,0x8080808080800000},{0x11090503FF030509,0x0000000001010101,0x00000000FFFFFFFF,0x0101010101000000,0xFFFFFFFFFF000000},{0x22120A07FF070A12,0x0000000003030303,0x00000000FEFEFEFE,0x0303030303000000,0xFEFEFEFEFE000000},{0x4424150EFF0E1524,0x0000000007070707,0x00000000FCFCFCFC,0x0707070707000000,0xFCFCFCFCFC000000},{0x88492A1CFF1C2A49,0x000000000F0F0F0F,0x00000000F8F8F8F8,0x0F0F0F0F0F000000,0xF8F8F8F8F8000000},{0x11925438FF385492,0x000000001F1F1F1F,0x00000000F0F0F0F0,0x1F1F1F1F1F000000,0xF0F0F0F0F0000000},{0x2224A870FF70A824,0x000000003F3F3F3F,0x00000000E0E0E0E0,0x3F3F3F3F3F000000,0xE0E0E0E0E0000000},{0x444850E0FFE05048,0x000000007F7F7F7F,0x00000000C0C0C0C0,0x7F7F7F7F7F000000,0xC0C0C0C0C0000000},{0x8890A0C0FFC0A090,0x00000000FFFFFFFF,0x0000000080808080,0xFFFFFFFFFF000000,0x8080808080000000},{0x090503FF03050911,0x0000000101010101,0x000000FFFFFFFFFF,0x0101010100000000,0xFFFFFFFF00000000},{0x120A07FF070A1222,0x0000000303030303,0x000000FEFEFEFEFE,0x0303030300000000,0xFEFEFEFE00000000},{0x24150EFF0E152444,0x0000000707070707,0x000000FCFCFCFCFC,0x0707070700000000,0xFCFCFCFC00000000},{0x492A1CFF1C2A4988,0x0000000F0F0F0F0F,0x000000F8F8F8F8F8,0x0F0F0F0F00000000,0xF8F8F8F800000000},{0x925438FF38549211,0x0000001F1F1F1F1F,0x000000F0F0F0F0F0,0x1F1F1F1F00000000,0xF0F0F0F000000000},{0x24A870FF70A82422,0x0000003F3F3F3F3F,0x000000E0E0E0E0E0,0x3F3F3F3F00000000,0xE0E0E0E000000000},{0x4850E0FFE0504844,0x0000007F7F7F7F7F,0x000000C0C0C0C0C0,0x7F7F7F7F00000000,0xC0C0C0C000000000},{0x90A0C0FFC0A09088,0x000000FFFFFFFFFF,0x0000008080808080,0xFFFFFFFF00000000,0x8080808000000000},{0x0503FF0305091121,0x0000010101010101,0x0000FFFFFFFFFFFF,0x0101010000000000,0xFFFFFF0000000000},{0x0A07FF070A122242,0x0000030303030303,0x0000FEFEFEFEFEFE,0x0303030000000000,0xFEFEFE0000000000},{0x150EFF0E15244484,0x0000070707070707,0x0000FCFCFCFCFCFC,0x0707070000000000,0xFCFCFC0000000000},{0x2A1CFF1C2A498808,0x00000F0F0F0F0F0F,0x0000F8F8F8F8F8F8,0x0F0F0F0000000000,0xF8F8F80000000000},{0x5438FF3854921110,0x00001F1F1F1F1F1F,0x0000F0F0F0F0F0F0,0x1F1F1F0000000000,0xF0F0F00000000000},{0xA870FF70A8242221,0x00003F3F3F3F3F3F,0x0000E0E0E0E0E0E0,0x3F3F3F0000000000,0xE0E0E00000000000},{0x50E0FFE050484442,0x00007F7F7F7F7F7F,0x0000C0C0C0C0C0C0,0x7F7F7F0000000000,0xC0C0C00000000000},{0xA0C0FFC0A0908884,0x0000FFFFFFFFFFFF,0x0000808080808080,0xFFFFFF0000000000,0x8080800000000000},{0x03FF030509112141,0x0001010101010101,0x00FFFFFFFFFFFFFF,0x0101000000000000,0xFFFF000000000000},{0x07FF070A12224282,0x0003030303030303,0x00FEFEFEFEFEFEFE,0x0303000000000000,0xFEFE000000000000},{0x0EFF0E1524448404,0x0007070707070707,0x00FCFCFCFCFCFCFC,0x0707000000000000,0xFCFC000000000000},{0x1CFF1C2A49880808,0x000F0F0F0F0F0F0F,0x00F8F8F8F8F8F8F8,0x0F0F000000000000,0xF8F8000000000000},{0x38FF385492111010,0x001F1F1F1F1F1F1F,0x00F0F0F0F0F0F0F0,0x1F1F000000000000,0xF0F0000000000000},{0x70FF70A824222120,0x003F3F3F3F3F3F3F,0x00E0E0E0E0E0E0E0,0x3F3F000000000000,0xE0E0000000000000},{0xE0FFE05048444241,0x007F7F7F7F7F7F7F,0x00C0C0C0C0C0C0C0,0x7F7F000000000000,0xC0C0000000000000},{0xC0FFC0A090888482,0x00FFFFFFFFFFFFFF,0x0080808080808080,0xFFFF000000000000,0x8080000000000000},{0xFF03050911214181,0x0101010101010101,0xFFFFFFFFFFFFFFFF,0x0100000000000000,0xFF00000000000000},{0xFF070A1222428202,0x0303030303030303,0xFEFEFEFEFEFEFEFE,0x0300000000000000,0xFE00000000000000},{0xFF0E152444840404,0x0707070707070707,0xFCFCFCFCFCFCFCFC,0x0700000000000000,0xFC00000000000000},{0xFF1C2A4988080808,0x0F0F0F0F0F0F0F0F,0xF8F8F8F8F8F8F8F8,0x0F00000000000000,0xF800000000000000},{0xFF38549211101010,0x1F1F1F1F1F1F1F1F,0xF0F0F0F0F0F0F0F0,0x1F00000000000000,0xF000000000000000},{0xFF70A82422212020,0x3F3F3F3F3F3F3F3F,0xE0E0E0E0E0E0E0E0,0x3F00000000000000,0xE000000000000000},{0xFFE0504844424140,0x7F7F7F7F7F7F7F7F,0xC0C0C0C0C0C0C0C0,0x7F00000000000000,0xC000000000000000},{0xFFC0A09088848281,0xFFFFFFFFFFFFFFFF,0x8080808080808080,0xFF00000000000000,0x8000000000000000}};
+  constexpr u64 corner=0x8100000000000081;
+  constexpr u64 x_squares=0x0042000000004200;
+  constexpr u64 c_squares=0x4281000000008142;
+  constexpr u64 possibleMove[8]={0x7F7F7F7F7F7F7F7F,0xFEFEFEFEFEFEFEFE,0x00FFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF00,0x007F7F7F7F7F7F7F,0xFEFEFEFEFEFEFE00,0x00FEFEFEFEFEFEFE,0x7F7F7F7F7F7F7F00};
+  constexpr u64 stable[64][5]={{0x81412111090503FF,0x0000000000000001,0x00000000000000FF,0x0101010101010101,0xFFFFFFFFFFFFFFFF},{0x02824222120A07FF,0x0000000000000003,0x00000000000000FE,0x0303030303030303,0xFEFEFEFEFEFEFEFE},{0x0404844424150EFF,0x0000000000000007,0x00000000000000FC,0x0707070707070707,0xFCFCFCFCFCFCFCFC},{0x08080888492A1CFF,0x000000000000000F,0x00000000000000F8,0x0F0F0F0F0F0F0F0F,0xF8F8F8F8F8F8F8F8},{0x10101011925438FF,0x000000000000001F,0x00000000000000F0,0x1F1F1F1F1F1F1F1F,0xF0F0F0F0F0F0F0F0},{0x2020212224A870FF,0x000000000000003F,0x00000000000000E0,0x3F3F3F3F3F3F3F3F,0xE0E0E0E0E0E0E0E0},{0x404142444850E0FF,0x000000000000007F,0x00000000000000C0,0x7F7F7F7F7F7F7F7F,0xC0C0C0C0C0C0C0C0},{0x8182848890A0C0FF,0x00000000000000FF,0x0000000000000080,0xFFFFFFFFFFFFFFFF,0x8080808080808080},{0x412111090503FF03,0x0000000000000101,0x000000000000FFFF,0x0101010101010100,0xFFFFFFFFFFFFFF00},{0x824222120A07FF07,0x0000000000000303,0x000000000000FEFE,0x0303030303030300,0xFEFEFEFEFEFEFE00},{0x04844424150EFF0E,0x0000000000000707,0x000000000000FCFC,0x0707070707070700,0xFCFCFCFCFCFCFC00},{0x080888492A1CFF1C,0x0000000000000F0F,0x000000000000F8F8,0x0F0F0F0F0F0F0F00,0xF8F8F8F8F8F8F800},{0x101011925438FF38,0x0000000000001F1F,0x000000000000F0F0,0x1F1F1F1F1F1F1F00,0xF0F0F0F0F0F0F000},{0x20212224A870FF70,0x0000000000003F3F,0x000000000000E0E0,0x3F3F3F3F3F3F3F00,0xE0E0E0E0E0E0E000},{0x4142444850E0FFE0,0x0000000000007F7F,0x000000000000C0C0,0x7F7F7F7F7F7F7F00,0xC0C0C0C0C0C0C000},{0x82848890A0C0FFC0,0x000000000000FFFF,0x0000000000008080,0xFFFFFFFFFFFFFF00,0x8080808080808000},{0x2111090503FF0305,0x0000000000010101,0x0000000000FFFFFF,0x0101010101010000,0xFFFFFFFFFFFF0000},{0x4222120A07FF070A,0x0000000000030303,0x0000000000FEFEFE,0x0303030303030000,0xFEFEFEFEFEFE0000},{0x844424150EFF0E15,0x0000000000070707,0x0000000000FCFCFC,0x0707070707070000,0xFCFCFCFCFCFC0000},{0x0888492A1CFF1C2A,0x00000000000F0F0F,0x0000000000F8F8F8,0x0F0F0F0F0F0F0000,0xF8F8F8F8F8F80000},{0x1011925438FF3854,0x00000000001F1F1F,0x0000000000F0F0F0,0x1F1F1F1F1F1F0000,0xF0F0F0F0F0F00000},{0x212224A870FF70A8,0x00000000003F3F3F,0x0000000000E0E0E0,0x3F3F3F3F3F3F0000,0xE0E0E0E0E0E00000},{0x42444850E0FFE050,0x00000000007F7F7F,0x0000000000C0C0C0,0x7F7F7F7F7F7F0000,0xC0C0C0C0C0C00000},{0x848890A0C0FFC0A0,0x0000000000FFFFFF,0x0000000000808080,0xFFFFFFFFFFFF0000,0x8080808080800000},{0x11090503FF030509,0x0000000001010101,0x00000000FFFFFFFF,0x0101010101000000,0xFFFFFFFFFF000000},{0x22120A07FF070A12,0x0000000003030303,0x00000000FEFEFEFE,0x0303030303000000,0xFEFEFEFEFE000000},{0x4424150EFF0E1524,0x0000000007070707,0x00000000FCFCFCFC,0x0707070707000000,0xFCFCFCFCFC000000},{0x88492A1CFF1C2A49,0x000000000F0F0F0F,0x00000000F8F8F8F8,0x0F0F0F0F0F000000,0xF8F8F8F8F8000000},{0x11925438FF385492,0x000000001F1F1F1F,0x00000000F0F0F0F0,0x1F1F1F1F1F000000,0xF0F0F0F0F0000000},{0x2224A870FF70A824,0x000000003F3F3F3F,0x00000000E0E0E0E0,0x3F3F3F3F3F000000,0xE0E0E0E0E0000000},{0x444850E0FFE05048,0x000000007F7F7F7F,0x00000000C0C0C0C0,0x7F7F7F7F7F000000,0xC0C0C0C0C0000000},{0x8890A0C0FFC0A090,0x00000000FFFFFFFF,0x0000000080808080,0xFFFFFFFFFF000000,0x8080808080000000},{0x090503FF03050911,0x0000000101010101,0x000000FFFFFFFFFF,0x0101010100000000,0xFFFFFFFF00000000},{0x120A07FF070A1222,0x0000000303030303,0x000000FEFEFEFEFE,0x0303030300000000,0xFEFEFEFE00000000},{0x24150EFF0E152444,0x0000000707070707,0x000000FCFCFCFCFC,0x0707070700000000,0xFCFCFCFC00000000},{0x492A1CFF1C2A4988,0x0000000F0F0F0F0F,0x000000F8F8F8F8F8,0x0F0F0F0F00000000,0xF8F8F8F800000000},{0x925438FF38549211,0x0000001F1F1F1F1F,0x000000F0F0F0F0F0,0x1F1F1F1F00000000,0xF0F0F0F000000000},{0x24A870FF70A82422,0x0000003F3F3F3F3F,0x000000E0E0E0E0E0,0x3F3F3F3F00000000,0xE0E0E0E000000000},{0x4850E0FFE0504844,0x0000007F7F7F7F7F,0x000000C0C0C0C0C0,0x7F7F7F7F00000000,0xC0C0C0C000000000},{0x90A0C0FFC0A09088,0x000000FFFFFFFFFF,0x0000008080808080,0xFFFFFFFF00000000,0x8080808000000000},{0x0503FF0305091121,0x0000010101010101,0x0000FFFFFFFFFFFF,0x0101010000000000,0xFFFFFF0000000000},{0x0A07FF070A122242,0x0000030303030303,0x0000FEFEFEFEFEFE,0x0303030000000000,0xFEFEFE0000000000},{0x150EFF0E15244484,0x0000070707070707,0x0000FCFCFCFCFCFC,0x0707070000000000,0xFCFCFC0000000000},{0x2A1CFF1C2A498808,0x00000F0F0F0F0F0F,0x0000F8F8F8F8F8F8,0x0F0F0F0000000000,0xF8F8F80000000000},{0x5438FF3854921110,0x00001F1F1F1F1F1F,0x0000F0F0F0F0F0F0,0x1F1F1F0000000000,0xF0F0F00000000000},{0xA870FF70A8242221,0x00003F3F3F3F3F3F,0x0000E0E0E0E0E0E0,0x3F3F3F0000000000,0xE0E0E00000000000},{0x50E0FFE050484442,0x00007F7F7F7F7F7F,0x0000C0C0C0C0C0C0,0x7F7F7F0000000000,0xC0C0C00000000000},{0xA0C0FFC0A0908884,0x0000FFFFFFFFFFFF,0x0000808080808080,0xFFFFFF0000000000,0x8080800000000000},{0x03FF030509112141,0x0001010101010101,0x00FFFFFFFFFFFFFF,0x0101000000000000,0xFFFF000000000000},{0x07FF070A12224282,0x0003030303030303,0x00FEFEFEFEFEFEFE,0x0303000000000000,0xFEFE000000000000},{0x0EFF0E1524448404,0x0007070707070707,0x00FCFCFCFCFCFCFC,0x0707000000000000,0xFCFC000000000000},{0x1CFF1C2A49880808,0x000F0F0F0F0F0F0F,0x00F8F8F8F8F8F8F8,0x0F0F000000000000,0xF8F8000000000000},{0x38FF385492111010,0x001F1F1F1F1F1F1F,0x00F0F0F0F0F0F0F0,0x1F1F000000000000,0xF0F0000000000000},{0x70FF70A824222120,0x003F3F3F3F3F3F3F,0x00E0E0E0E0E0E0E0,0x3F3F000000000000,0xE0E0000000000000},{0xE0FFE05048444241,0x007F7F7F7F7F7F7F,0x00C0C0C0C0C0C0C0,0x7F7F000000000000,0xC0C0000000000000},{0xC0FFC0A090888482,0x00FFFFFFFFFFFFFF,0x0080808080808080,0xFFFF000000000000,0x8080000000000000},{0xFF03050911214181,0x0101010101010101,0xFFFFFFFFFFFFFFFF,0x0100000000000000,0xFF00000000000000},{0xFF070A1222428202,0x0303030303030303,0xFEFEFEFEFEFEFEFE,0x0300000000000000,0xFE00000000000000},{0xFF0E152444840404,0x0707070707070707,0xFCFCFCFCFCFCFCFC,0x0700000000000000,0xFC00000000000000},{0xFF1C2A4988080808,0x0F0F0F0F0F0F0F0F,0xF8F8F8F8F8F8F8F8,0x0F00000000000000,0xF800000000000000},{0xFF38549211101010,0x1F1F1F1F1F1F1F1F,0xF0F0F0F0F0F0F0F0,0x1F00000000000000,0xF000000000000000},{0xFF70A82422212020,0x3F3F3F3F3F3F3F3F,0xE0E0E0E0E0E0E0E0,0x3F00000000000000,0xE000000000000000},{0xFFE0504844424140,0x7F7F7F7F7F7F7F7F,0xC0C0C0C0C0C0C0C0,0x7F00000000000000,0xC000000000000000},{0xFFC0A09088848281,0xFFFFFFFFFFFFFFFF,0x8080808080808080,0xFF00000000000000,0x8000000000000000}};
 }
 
 // Tools: Debug
@@ -41,7 +46,7 @@ mt19937 rng(20040725^chrono::steady_clock::now().time_since_epoch().count());
 template<class T> inline T rand(T l,T r){return uniform_int_distribution<T>(l,r)(rng);}
 inline u32 fakeRng(){
   static u32 seed=416;
-	return seed^=seed>>5,seed^=seed<<17,seed^=seed>>13;
+  return seed^=seed>>5,seed^=seed<<17,seed^=seed>>13;
 }
 
 // Tools: Bit Operation
@@ -140,6 +145,16 @@ struct Map{
   inline void reset(int i,int j){a&=-1ull^(1ull<<id(i,j));}
   inline void paint(int i,int j,int x){x?this->set(i,j):this->reset(i,j);}
 
+  inline string to_string()const{
+    string plain;
+    for(int i=0;i<8;i++){
+      for(int j=0;j<8;j++)
+        plain+=get(i,j)?"*":".";
+      plain+="\n";
+    }
+    return plain;
+  }
+
   Map():a(0ull){}
   Map(u64 a):a(a){}
 };
@@ -148,21 +163,25 @@ struct Map{
 struct Board{
   Map map[2];
 
-  inline u64 getMove(bit)const;
-  inline int getMoveSize(bit)const;
-  inline bit checkMove(bit,int)const;
+  template<const bit c> inline u64 getMove()const;
+  template<const bit c> inline int getMoveSize()const;
+  template<const bit c> inline bit checkMove(int)const;
 
-  inline u64 getStable(bit)const;
-  inline int getStableSize(bit)const;
+  template<const bit c> inline u64 getStable()const;
+  template<const bit c> inline int getStableSize()const;
 
-  inline void move(bit,int);
-  inline void move(bit,int,int);
+  template<const bit c> inline u64 getFront()const;
+  template<const bit c> inline int getFrontSize()const;
 
-  inline int judge(bit)const;
-  inline int judgeSide(bit,int)const;
-  inline int judgeFinal(bit)const;
+  template<const bit c> inline void move(int);
+  template<const bit c> inline void move(int,int);
 
-  inline void reverse(){swap(map[0],map[1]);}
+  template<const bit c> inline int judge()const;
+  template<const bit c> inline int judgeSide(int)const;
+  template<const bit c> inline int judgeFinal()const;
+
+  inline void reverse(){swap(this->map[0],this->map[1]);}
+  inline u64 rest()const{return -1ull^this->map[0].a^this->map[1].a;}
 
   inline string to_string()const{
     string text;
@@ -190,19 +209,23 @@ struct Board{
 struct Movement{
   int move,value;
 
-  inline int judge(Board,bit);
-
   inline bool operator<(const Movement &rhs)const{return value<rhs.value;}
   inline bool operator==(const Movement &rhs)const{return value==rhs.value;}
 
   Movement(int move,int value):move(move),value(value){}
-  Movement(int move,Board board,bit col):move(move){board.move(col,move),value=board.judge(col);}
+  Movement(int move,Board board,bit col):move(move){
+    if(col){
+      board.move<1>(move);
+      value=board.judge<1>();
+    }else{
+      board.move<0>(move);
+      value=board.judge<0>();
+    }
+  }
 };
 
 // Function: init
 namespace Judger{
-  constexpr int nxt[8][2]={{1,0},{0,1},{-1,0},{0,-1},{1,1},{-1,-1},{1,-1},{-1,1}};
-
   struct MagicNumber{
     string name,type,plain;
     inline MagicNumber(string base,u64 value):type("u64"){
@@ -221,7 +244,7 @@ namespace Judger{
     }
   };
   string to_string(const MagicNumber &x){
-    return "const "+x.type+" "+x.name+"="+x.plain+";";
+    return "constexpr "+x.type+" "+x.name+"="+x.plain+";";
   }
 
   vec<MagicNumber> out;
@@ -233,11 +256,19 @@ namespace Judger{
       }
       return target;
     };
-
     out.push_back(MagicNumber("corner",buildMap({{0,0},{0,7},{7,0},{7,7}})));
     out.push_back(MagicNumber("x_squares",buildMap({{1,1},{1,6},{6,1},{6,6}})));
     out.push_back(MagicNumber("c_squares",buildMap({{0,1},{1,0},{1,7},{0,6},{7,1},{6,0},{7,6},{6,7}})));
-
+    auto possibleMove=vec<u64>(8);
+    for(int w=0;w<8;w++){
+      for(int i=0;i<8;i++)
+        for(int j=0;j<8;j++){
+          int ti=i+nxt[w][0],tj=j+nxt[w][1];
+          if(ti<0||tj<0||ti>=8||tj>=8)continue;
+          possibleMove[w]|=1ull<<id(i,j);
+        }
+    }
+    out.push_back(MagicNumber("possibleMove",possibleMove));
     auto stable=vec<vec<u64>>(64);
     for(int x=0;x<8;x++)
       for(int y=0;y<8;y++){
@@ -270,12 +301,10 @@ namespace Judger{
         stable[id(x,y)].push_back(now.source()),now.reset();
       }
     out.push_back(MagicNumber("stable",stable));
-
     for(const auto &num:out)log("%s\n",to_string(num).c_str());
   }
 }
 
-constexpr int nxt[8][2]={{1,0},{0,1},{-1,0},{0,-1},{1,1},{-1,-1},{1,-1},{-1,1}};
 vec<int> walk[64][8];
 vec<u64> walkpath[64][8];
 void init(){
@@ -296,7 +325,7 @@ void init(){
 }
 
 // Function: get all moves
-inline u64 Board::getMove(bit c)const{
+template<const bit c> inline u64 Board::getMove()const{
   u64 res=0;
   for(int i=0;i<64;i++)
     if(!map[c].get(i)&&!map[c^1].get(i)){
@@ -312,11 +341,11 @@ inline u64 Board::getMove(bit c)const{
     }
   return res;
 }
-inline int Board::getMoveSize(bit c)const{
-  return popcnt(this->getMove(c));
+template<const bit c> inline int Board::getMoveSize()const{
+  return popcnt(this->getMove<c>());
 }
-inline bit Board::checkMove(bit c,int now)const{
-  u64 moves=this->getMove(c);
+template<const bit c> inline bit Board::checkMove(int now)const{
+  u64 moves=this->getMove<c>();
   if(!moves){
     return now==-1;
   }else{
@@ -325,7 +354,7 @@ inline bit Board::checkMove(bit c,int now)const{
 }
 
 // Function: get stable chess
-inline u64 Board::getStable(bit c)const{
+template<const bit c> inline u64 Board::getStable()const{
   u64 res=0;
   for(int i=0;i<64;i++)
     if(subset(Judger::stable[i][0],(this->map[0].a|this->map[1].a))|| 
@@ -337,7 +366,7 @@ inline u64 Board::getStable(bit c)const{
     }
   return res;
 }
-inline int Board::getStableSize(bit c)const{
+template<const bit c> inline int Board::getStableSize()const{
   int cnt=0;
   for(int i=0;i<64;i++)
     if(subset(Judger::stable[i][0],(this->map[0].a|this->map[1].a))|| 
@@ -350,9 +379,27 @@ inline int Board::getStableSize(bit c)const{
   return cnt;
 }
 
+// Function: get chess in front
+template<const bit c> inline u64 Board::getFront()const{
+  u64 rest=this->rest();
+  u64 res=0;
+  res|=((rest&Judger::possibleMove[E])>>1)&this->map[c].source();
+  res|=((rest&Judger::possibleMove[W])<<1)&this->map[c].source();
+  res|=((rest&Judger::possibleMove[S])>>8)&this->map[c].source();
+  res|=((rest&Judger::possibleMove[N])<<8)&this->map[c].source();
+  res|=((rest&Judger::possibleMove[SW])>>7)&this->map[c].source();
+  res|=((rest&Judger::possibleMove[NE])<<7)&this->map[c].source();
+  res|=((rest&Judger::possibleMove[SE])>>9)&this->map[c].source();
+  res|=((rest&Judger::possibleMove[NW])<<9)&this->map[c].source();
+  return res;
+}
+template<const bit c> inline int Board::getFrontSize()const{
+  return popcnt(this->getFront<c>());
+}
+
 // Function: play a movement
-inline void Board::move(bit c,int i,int j){this->move(c,id(i,j));}
-inline void Board::move(bit c,int u){
+template<const bit c> inline void Board::move(int i,int j){this->move<c>(id(i,j));}
+template<const bit c> inline void Board::move(int u){
   if(!~u)return;
   this->map[c].set(u);
   for(int w=0;w<8;w++)
@@ -369,14 +416,14 @@ inline void Board::move(bit c,int u){
 
 // Function: Judge
 int JudgeStatus=1;
-inline int Board::judgeSide(bit c,int mov)const{
-  static constexpr int corner_pt=2000;
-  static constexpr int x_squares_pt=-1100;
-  static constexpr int c_squares_pt=-600;
+template<const bit c> inline int Board::judgeSide(int mov)const{
+  static constexpr int corner_pt=1800;
+  static constexpr int x_squares_pt=-600;
+  static constexpr int c_squares_pt=-200;
   int res=0;
   int cnt=this->map[c].count();
   if(!cnt)return -20040725;
-  Map rest=-1ull^this->map[0].source()^this->map[1].source();
+  Map rest=this->rest();
   //边角定权
   res+=this->map[c].intersection(Judger::corner)*corner_pt;
   if(rest.get(0,0)){
@@ -401,35 +448,33 @@ inline int Board::judgeSide(bit c,int mov)const{
   }
   //行动力
   res+=mov*30;
-  if(!mov)res-=200;
-  if(mov==1)res-=100;
-  if(mov==2)res-=50;
+  if(!mov)res-=1000;
+  if(mov==1)res-=300;
+  if(mov==2)res-=100;
   //稳定子
-  int sta=this->getStableSize(c);
-  res+=sta*40;
+  int sta=this->getStableSize<c>();
+  res+=sta*50;
   if(sta>=32)return 20040725;
   //占子策略
   if(JudgeStatus==1){
+    res-=this->getFrontSize<c>()*20;
     res-=cnt*10;
   }else if(JudgeStatus==2){
-    res+=cnt*30+sta*20;
+    res-=this->getFrontSize<c>()*5;
+    res+=cnt*25+sta*25;
   }
   return res;
 }
-inline int Board::judgeFinal(bit c)const{
+template<const bit c> inline int Board::judgeFinal()const{
   int cnt[]={this->map[0].count(),this->map[1].count()};
   return cnt[0]==cnt[1]?0:((cnt[c]>cnt[c^1]?20040725:-20040725)<<1);
 }
-inline int Board::judge(bit c)const{
-  int mov[]={this->getMoveSize(0),this->getMoveSize(1)};
+template<const bit c> inline int Board::judge()const{
+  int mov[]={this->getMoveSize<0>(),this->getMoveSize<1>()};
   if(!mov[0]&&!mov[1]){
-    return this->judgeFinal(c);
+    return this->judgeFinal<c>();
   }
-  return this->judgeSide(c,mov[c])-this->judgeSide(c^1,mov[c^1])+(fakeRng()%9-4);
-}
-inline int Movement::judge(Board board,bit col){
-  board.move(col,this->move);
-  return this->value=board.judge(col);
+  return this->judgeSide<c>(mov[c])-this->judgeSide<c^1>(mov[c^1])+(fakeRng()%5-2);
 }
 
 // Function: Alpha-Beta Search
@@ -446,7 +491,7 @@ namespace AlphaBetaSearch{
   Board stackBoard[64][64];
 
   int bruteForce(){
-    vec<Movement> moves=u64ToVec(board.getMove(col))
+    vec<Movement> moves=u64ToVec(col?board.getMove<1>():board.getMove<0>())
       .map((function<Movement(int)>)[&](int move){
         return Movement(move,board,col);
       });
@@ -459,7 +504,7 @@ namespace AlphaBetaSearch{
   }
   
   int randomChoose(){
-    vec<int> moves=u64ToVec(board.getMove(col));
+    vec<int> moves=u64ToVec(col?board.getMove<1>():board.getMove<0>());
     if(!moves.size()){
       return -1;
     }else{
@@ -469,7 +514,7 @@ namespace AlphaBetaSearch{
 
   void finishSearch(int movement){
     debug("[alpha-beta] maxDepth=%d answerWeight=%d\n",maxDepth,ans.sec);
-    if(board.checkMove(col,movement)){
+    if(col?board.checkMove<1>(movement):board.checkMove<0>(movement)){
       callback(movement);
     }else{
       debug("[error] Illegal moves!!! (move=%d)",movement);
@@ -478,24 +523,22 @@ namespace AlphaBetaSearch{
     exit(0);
   }
 
-  int search(const Board &board,int step,int alpha,int beta){
-    bit mycol=col^(step&1);
+  template<const bit c> int search(const Board &board,int step,int alpha,int beta){
     if(!(++tick&1023)&&clock()/(double)CLOCKS_PER_SEC>0.96){
       return finishSearch(ans.fir),0;
     }
     if(step>maxDepth){
-      return board.judge(mycol);
+      return board.judge<c>();
     }
 
     vec<int> ord;
     pair<int,int> best(-1,-INFW);
-
-    u64 moves=board.getMove(mycol);
+    u64 moves=board.getMove<c>();
     for(int i=0;i<64;i++)if((moves>>i)&1){
       ord.push_back(i);
       stackBoard[step][i]=board;
-      stackBoard[step][i].move(mycol,i);
-      stackValue[step][i]=stackBoard[step][i].judge(mycol);
+      stackBoard[step][i].move<c>(i);
+      stackValue[step][i]=stackBoard[step][i].judge<c>();
     }
     sort(ord.begin(),ord.end(),[&](int x,int y){
       return stackValue[step][x]>stackValue[step][y];
@@ -506,12 +549,12 @@ namespace AlphaBetaSearch{
       const Board &next=stackBoard[step][i];
       int val;
       if(flagPVS){
-        val=-search(next,step+1,-alpha-1,-alpha);
+        val=-search<c^1>(next,step+1,-alpha-1,-alpha);
         if(val>alpha&&val<beta){
-          val=-search(next,step+1,-beta,-alpha);
+          val=-search<c^1>(next,step+1,-beta,-alpha);
         }
       }else{
-        val=-search(next,step+1,-beta,-alpha);
+        val=-search<c^1>(next,step+1,-beta,-alpha);
       }
       if(val>=beta)return val;
       if(val>alpha){
@@ -521,7 +564,7 @@ namespace AlphaBetaSearch{
       }
     }
     if(!moves){
-      int val=-search(board,step+1,-beta,-alpha);
+      int val=-search<c^1>(board,step+1,-beta,-alpha);
       if(val>=beta)return val;
       if(val>alpha){
         alpha=val;
@@ -536,17 +579,21 @@ namespace AlphaBetaSearch{
   void solve(const Board &_board,bit _col,function<void(int)> _callback){
     board=_board,col=_col,callback=_callback;
 
-    if(!board.getMove(col)){
+    if(!(col?board.getMove<1>():board.getMove<0>())){
       log("[alpha-beta] no moves at all!");
       return finishSearch(-1);
     }
-    if(board.map[col].count()<=3&&board.map[col^1].count()<=5){
+    if(board.map[col].count()<=3&&board.map[col^1].count()<=3){
       return finishSearch(randomChoose());
     }
 
     ans=make_pair(-1,-INFW);
     for(maxDepth=3;maxDepth<64;maxDepth++){
-      search(board,0,-INFW,INFW);
+      if(col){
+        search<1>(board,0,-INFW,INFW);
+      }else{
+        search<0>(board,0,-INFW,INFW);
+      }
       Movement ansMovement(ans.fir,board,col);
       debug("ans=[%d %d] : x=%d y=%d value=%d\n",ans.fir,ans.sec,idx(ans.fir),idy(ans.fir),ansMovement.value);
     }
@@ -560,7 +607,7 @@ namespace AlphaBetaSearch{
 int main(){
 #ifdef memset0
   freopen("testinput.in","r",stdin);
-  // Judger::build();
+  Judger::build();
 #endif
   log("[bot] start!\n");
   for(int t=rand(0,233);t--;)fakeRng();
@@ -571,7 +618,7 @@ int main(){
   board.map[1].set(3,4),board.map[1].set(4,3);
 
   int n;
-  vec<pair<int,int>> go;  
+  vec<pair<int,int>> go;
   cin>>n;
   if(n>16){
     JudgeStatus=2;
@@ -584,12 +631,16 @@ int main(){
   bit col=go.front().fir==-1&&go.front().sec==-1;
   for(int i=0;i<(int)go.size();i++)
     if(~go[i].fir&&~go[i].sec){
-      board.move((i&1)^col^1,go[i].fir,go[i].sec);
+      if((i&1)^col){
+        board.move<0>(go[i].fir,go[i].sec);
+      }else{
+        board.move<1>(go[i].fir,go[i].sec);
+      }
     }
   log("[bot] color=%d\n",col);
 
   AlphaBetaSearch::solve(board,col,[&](int movement){
-    log("[bot] finished. (clock=%.6lf)\n",clock()/(double)CLOCKS_PER_SEC);
+    debug("[bot] finished. (clock=%.6lf)\n",clock()/(double)CLOCKS_PER_SEC);
     if(~movement){
       cout<<idx(movement)<<" "<<idy(movement)<<endl;
     }else{
