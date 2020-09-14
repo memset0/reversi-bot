@@ -222,6 +222,7 @@ int replayMain(){
     return plain;
 	};
   printf(">> %lu %lu\n",data[0].size(),data[1].size());
+  
 	for(int n=1;(n<<1)-1<=data[1].size()||(n<<1)-1<=data[0].size();n++){
     log("\e[33m\n=== Round %d ===\e[0m\n",n);
 		if((n<<1)-1<=data[1].size()){
@@ -233,6 +234,7 @@ int replayMain(){
 		}
     pair<int,int> mov1=(n<<1)<=data[1].size()?data[1][(n<<1)-1]:make_pair(-1,-1);
     log("\e[31mBLACK: %d %d\e[0m\n",mov1.fir,mov1.sec);
+
 		if((n<<1)-1<=data[0].size()){
       writeFile("judger/input0.in",filterData(n,data[0]));
       shell("judger/player0.exe < judger/input0.in > judger/output0.out",1);
@@ -242,7 +244,6 @@ int replayMain(){
 		}
     pair<int,int> mov0=(n<<1)<=data[0].size()?data[0][(n<<1)-1]:make_pair(-1,-1);
     log("\e[31mWHITE: %d %d\e[0m\n",mov0.fir,mov0.sec);
-    if(n==4)break;
 	}
 
 	return 0;

@@ -1,0 +1,1 @@
+var rep=(n)=>{if(!n)return;$("#frmCreateBot .btn-primary").click(),setTimeout(()=>rep(n-1),300)}
