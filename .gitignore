@@ -2,6 +2,7 @@ judger
 others-example
 *.in
 *.out
+*.json
 .DS_Store
 
 # Prerequisites
