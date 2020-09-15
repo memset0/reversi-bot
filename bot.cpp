@@ -1,6 +1,7 @@
 #include<algorithm>
 #include<cassert>
 #include<cstdio>
+#include<cstring>
 #include<chrono>
 #include<functional>
 #include<iomanip>
@@ -8,6 +9,12 @@
 #include<random>
 #include<sstream>
 #include<vector>
+
+#define SimpleIO 1
+#ifndef SimpleIO
+  #include"jsoncpp/json.h"
+  #define JsonIO 1
+#endif
 
 #define fir first
 #define sec second
@@ -28,8 +35,6 @@ constexpr int nxt[8][2]={{0,1},{0,-1},{1,0},{-1,0},{1,1},{-1,-1},{1,-1},{-1,1}};
 // auto generated
 namespace Judger{
   constexpr u64 corner=0x8100000000000081;
-  constexpr u64 x_squares=0x0042000000004200;
-  constexpr u64 c_squares=0x4281000000008142;
   constexpr u64 possibleMove[8]={0x7F7F7F7F7F7F7F7F,0xFEFEFEFEFEFEFEFE,0x00FFFFFFFFFFFFFF,0xFFFFFFFFFFFFFF00,0x007F7F7F7F7F7F7F,0xFEFEFEFEFEFEFE00,0x00FEFEFEFEFEFEFE,0x7F7F7F7F7F7F7F00};
   constexpr u64 stableEach[64]={0x81412111090503FF,0x02824222120A07FF,0x0404844424150EFF,0x08080888492A1CFF,0x10101011925438FF,0x2020212224A870FF,0x404142444850E0FF,0x8182848890A0C0FF,0x412111090503FF03,0x824222120A07FF07,0x04844424150EFF0E,0x080888492A1CFF1C,0x101011925438FF38,0x20212224A870FF70,0x4142444850E0FFE0,0x82848890A0C0FFC0,0x2111090503FF0305,0x4222120A07FF070A,0x844424150EFF0E15,0x0888492A1CFF1C2A,0x1011925438FF3854,0x212224A870FF70A8,0x42444850E0FFE050,0x848890A0C0FFC0A0,0x11090503FF030509,0x22120A07FF070A12,0x4424150EFF0E1524,0x88492A1CFF1C2A49,0x11925438FF385492,0x2224A870FF70A824,0x444850E0FFE05048,0x8890A0C0FFC0A090,0x090503FF03050911,0x120A07FF070A1222,0x24150EFF0E152444,0x492A1CFF1C2A4988,0x925438FF38549211,0x24A870FF70A82422,0x4850E0FFE0504844,0x90A0C0FFC0A09088,0x0503FF0305091121,0x0A07FF070A122242,0x150EFF0E15244484,0x2A1CFF1C2A498808,0x5438FF3854921110,0xA870FF70A8242221,0x50E0FFE050484442,0xA0C0FFC0A0908884,0x03FF030509112141,0x07FF070A12224282,0x0EFF0E1524448404,0x1CFF1C2A49880808,0x38FF385492111010,0x70FF70A824222120,0xE0FFE05048444241,0xC0FFC0A090888482,0xFF03050911214181,0xFF070A1222428202,0xFF0E152444840404,0xFF1C2A4988080808,0xFF38549211101010,0xFF70A82422212020,0xFFE0504844424140,0xFFC0A09088848281};
   constexpr u64 stableSide[64][4]={{0x0000000000000001,0x00000000000000FF,0x0101010101010101,0xFFFFFFFFFFFFFFFF},{0x0000000000000003,0x00000000000000FE,0x0303030303030303,0xFEFEFEFEFEFEFEFE},{0x0000000000000007,0x00000000000000FC,0x0707070707070707,0xFCFCFCFCFCFCFCFC},{0x000000000000000F,0x00000000000000F8,0x0F0F0F0F0F0F0F0F,0xF8F8F8F8F8F8F8F8},{0x000000000000001F,0x00000000000000F0,0x1F1F1F1F1F1F1F1F,0xF0F0F0F0F0F0F0F0},{0x000000000000003F,0x00000000000000E0,0x3F3F3F3F3F3F3F3F,0xE0E0E0E0E0E0E0E0},{0x000000000000007F,0x00000000000000C0,0x7F7F7F7F7F7F7F7F,0xC0C0C0C0C0C0C0C0},{0x00000000000000FF,0x0000000000000080,0xFFFFFFFFFFFFFFFF,0x8080808080808080},{0x0000000000000101,0x000000000000FFFF,0x0101010101010100,0xFFFFFFFFFFFFFF00},{0x0000000000000303,0x000000000000FEFE,0x0303030303030300,0xFEFEFEFEFEFEFE00},{0x0000000000000707,0x000000000000FCFC,0x0707070707070700,0xFCFCFCFCFCFCFC00},{0x0000000000000F0F,0x000000000000F8F8,0x0F0F0F0F0F0F0F00,0xF8F8F8F8F8F8F800},{0x0000000000001F1F,0x000000000000F0F0,0x1F1F1F1F1F1F1F00,0xF0F0F0F0F0F0F000},{0x0000000000003F3F,0x000000000000E0E0,0x3F3F3F3F3F3F3F00,0xE0E0E0E0E0E0E000},{0x0000000000007F7F,0x000000000000C0C0,0x7F7F7F7F7F7F7F00,0xC0C0C0C0C0C0C000},{0x000000000000FFFF,0x0000000000008080,0xFFFFFFFFFFFFFF00,0x8080808080808000},{0x0000000000010101,0x0000000000FFFFFF,0x0101010101010000,0xFFFFFFFFFFFF0000},{0x0000000000030303,0x0000000000FEFEFE,0x0303030303030000,0xFEFEFEFEFEFE0000},{0x0000000000070707,0x0000000000FCFCFC,0x0707070707070000,0xFCFCFCFCFCFC0000},{0x00000000000F0F0F,0x0000000000F8F8F8,0x0F0F0F0F0F0F0000,0xF8F8F8F8F8F80000},{0x00000000001F1F1F,0x0000000000F0F0F0,0x1F1F1F1F1F1F0000,0xF0F0F0F0F0F00000},{0x00000000003F3F3F,0x0000000000E0E0E0,0x3F3F3F3F3F3F0000,0xE0E0E0E0E0E00000},{0x00000000007F7F7F,0x0000000000C0C0C0,0x7F7F7F7F7F7F0000,0xC0C0C0C0C0C00000},{0x0000000000FFFFFF,0x0000000000808080,0xFFFFFFFFFFFF0000,0x8080808080800000},{0x0000000001010101,0x00000000FFFFFFFF,0x0101010101000000,0xFFFFFFFFFF000000},{0x0000000003030303,0x00000000FEFEFEFE,0x0303030303000000,0xFEFEFEFEFE000000},{0x0000000007070707,0x00000000FCFCFCFC,0x0707070707000000,0xFCFCFCFCFC000000},{0x000000000F0F0F0F,0x00000000F8F8F8F8,0x0F0F0F0F0F000000,0xF8F8F8F8F8000000},{0x000000001F1F1F1F,0x00000000F0F0F0F0,0x1F1F1F1F1F000000,0xF0F0F0F0F0000000},{0x000000003F3F3F3F,0x00000000E0E0E0E0,0x3F3F3F3F3F000000,0xE0E0E0E0E0000000},{0x000000007F7F7F7F,0x00000000C0C0C0C0,0x7F7F7F7F7F000000,0xC0C0C0C0C0000000},{0x00000000FFFFFFFF,0x0000000080808080,0xFFFFFFFFFF000000,0x8080808080000000},{0x0000000101010101,0x000000FFFFFFFFFF,0x0101010100000000,0xFFFFFFFF00000000},{0x0000000303030303,0x000000FEFEFEFEFE,0x0303030300000000,0xFEFEFEFE00000000},{0x0000000707070707,0x000000FCFCFCFCFC,0x0707070700000000,0xFCFCFCFC00000000},{0x0000000F0F0F0F0F,0x000000F8F8F8F8F8,0x0F0F0F0F00000000,0xF8F8F8F800000000},{0x0000001F1F1F1F1F,0x000000F0F0F0F0F0,0x1F1F1F1F00000000,0xF0F0F0F000000000},{0x0000003F3F3F3F3F,0x000000E0E0E0E0E0,0x3F3F3F3F00000000,0xE0E0E0E000000000},{0x0000007F7F7F7F7F,0x000000C0C0C0C0C0,0x7F7F7F7F00000000,0xC0C0C0C000000000},{0x000000FFFFFFFFFF,0x0000008080808080,0xFFFFFFFF00000000,0x8080808000000000},{0x0000010101010101,0x0000FFFFFFFFFFFF,0x0101010000000000,0xFFFFFF0000000000},{0x0000030303030303,0x0000FEFEFEFEFEFE,0x0303030000000000,0xFEFEFE0000000000},{0x0000070707070707,0x0000FCFCFCFCFCFC,0x0707070000000000,0xFCFCFC0000000000},{0x00000F0F0F0F0F0F,0x0000F8F8F8F8F8F8,0x0F0F0F0000000000,0xF8F8F80000000000},{0x00001F1F1F1F1F1F,0x0000F0F0F0F0F0F0,0x1F1F1F0000000000,0xF0F0F00000000000},{0x00003F3F3F3F3F3F,0x0000E0E0E0E0E0E0,0x3F3F3F0000000000,0xE0E0E00000000000},{0x00007F7F7F7F7F7F,0x0000C0C0C0C0C0C0,0x7F7F7F0000000000,0xC0C0C00000000000},{0x0000FFFFFFFFFFFF,0x0000808080808080,0xFFFFFF0000000000,0x8080800000000000},{0x0001010101010101,0x00FFFFFFFFFFFFFF,0x0101000000000000,0xFFFF000000000000},{0x0003030303030303,0x00FEFEFEFEFEFEFE,0x0303000000000000,0xFEFE000000000000},{0x0007070707070707,0x00FCFCFCFCFCFCFC,0x0707000000000000,0xFCFC000000000000},{0x000F0F0F0F0F0F0F,0x00F8F8F8F8F8F8F8,0x0F0F000000000000,0xF8F8000000000000},{0x001F1F1F1F1F1F1F,0x00F0F0F0F0F0F0F0,0x1F1F000000000000,0xF0F0000000000000},{0x003F3F3F3F3F3F3F,0x00E0E0E0E0E0E0E0,0x3F3F000000000000,0xE0E0000000000000},{0x007F7F7F7F7F7F7F,0x00C0C0C0C0C0C0C0,0x7F7F000000000000,0xC0C0000000000000},{0x00FFFFFFFFFFFFFF,0x0080808080808080,0xFFFF000000000000,0x8080000000000000},{0x0101010101010101,0xFFFFFFFFFFFFFFFF,0x0100000000000000,0xFF00000000000000},{0x0303030303030303,0xFEFEFEFEFEFEFEFE,0x0300000000000000,0xFE00000000000000},{0x0707070707070707,0xFCFCFCFCFCFCFCFC,0x0700000000000000,0xFC00000000000000},{0x0F0F0F0F0F0F0F0F,0xF8F8F8F8F8F8F8F8,0x0F00000000000000,0xF800000000000000},{0x1F1F1F1F1F1F1F1F,0xF0F0F0F0F0F0F0F0,0x1F00000000000000,0xF000000000000000},{0x3F3F3F3F3F3F3F3F,0xE0E0E0E0E0E0E0E0,0x3F00000000000000,0xE000000000000000},{0x7F7F7F7F7F7F7F7F,0xC0C0C0C0C0C0C0C0,0x7F00000000000000,0xC000000000000000},{0xFFFFFFFFFFFFFFFF,0x8080808080808080,0xFF00000000000000,0x8000000000000000}};
@@ -58,59 +63,82 @@ inline u32 fakeRng(){
 // Tools: Helper Libs
 using std::cin;
 using std::cout;
+using std::cerr;
 using std::endl;
-using std::string;
 using std::function;
-template<class T> struct vec:std::vector<T>{
+
+template<class T> struct vector:std::vector<T>{
   using std::vector<T>::vector;
   
-  inline vec<T> slice(int l,int r)const{return vec(this->begin()+l,this->begin()+r);}
-  inline vec<T> concat(const vec<T> &rhs){this->insert(this->end(),rhs.begin(),rhs.end());}
+  inline vector<T> slice(int l,int r)const{return vector(this->begin()+l,this->begin()+r);}
+  inline vector<T> concat(const vector<T> &rhs){this->insert(this->end(),rhs.begin(),rhs.end());}
   inline T random_item(){return this->operator[](rand(0,(int)this->size()-1));}
   inline bit includes(const T &x){return find(this->begin(),this->end(),x)!=this->end();}
 
   inline void forEach(const function<void(T)> &func){
     for(const auto &it:*this)func(it);
   }
-  template<class TT> inline vec<TT> map(const function<TT(T)> &func){
-    vec<TT> res;
+  template<class TT> inline vector<TT> map(const function<TT(T)> &func)const{
+    vector<TT> res;
     for(const auto &it:*this)res.push_back(func(it));
     return res;
   }
 
-  inline static vec<int> from(u64 sta){
-    vec<int> res;
+  inline static vector<int> from(u64 sta){
+    vector<int> res;
     for(int i=0;i<64;i++)if((sta>>i)&1)res.push_back(i);
     return res;
   }
 };
-template<class T> string to_string(const vec<T> &v){
-  string res;
-  if(v.size()){
-    res+=to_string(v[0]);
-    for(size_t i=1;i<v.size();i++)res+=","+to_string(v[i]);
+
+struct string:std::string{
+  using std::string::string;
+  string(const std::string &plain):std::string(plain){}
+
+  inline string join(const vector<string> &vet)const{
+    if(!vet.size())return "";
+    string res=vet[0];
+    for(int i=1;i<(int)vet.size();i++){
+      res+=*this;
+      res+=vet[i];
+    }
+    return res;
   }
-  return "{"+res+"}";
-}
-template<class T> string to_string(const vec<T> &v,function<string(T)> custom){
-  string res;
-  if(v.size()){
-    res+=custom(v[0]);
-    for(size_t i=1;i<v.size();i++)res+=","+custom(v[i]);
+  template<class T> inline string join(const vector<T> &vet)const{
+    return this->join(vet.map((function<string(T)>)[](const T &x){return std::to_string(x);}));
   }
-  return "{"+res+"}";
+  template<class T> inline string join(const vector<T> &vet,function<string(T)> custom_to_string)const{
+    return this->join(vet.map((function<string(T)>)[&](const T &x){return custom_to_string(x);}));
+  }
+
+  vector<string> split(const string &delim){
+    if(this->empty())return {};
+    cerr<<"split"<<delim<<endl;
+    char *src=new char[this->length()+1];
+    strcpy(src,this->c_str()); 
+    char *tar=new char[delim.length()+1];
+    strcpy(tar,delim.c_str());
+    cerr<<"split"<<delim<<endl;
+    vector<string> res;
+    char *pos=strtok(src,tar);
+    while(pos){
+      res.push_back(string(pos));
+      pos=strtok(nullptr,tar);
+    }
+    delete[] src;
+    delete[] tar;
+    return res;
+  }
+};
+
+template<class T> string to_string(const vector<T> &v){
+  return "{"+string(",").join(v)+"}";
+}
+template<class T> string to_string(const vector<T> &v,function<string(T)> custom_to_string){
+  return "{"+string(",").join(v,custom_to_string)+"}";
 }
 
-
-// Tools: Bit Operation
-#define id(i,j) (((i)<<3)|(j))
-#define idx(v) ((v)>>3)
-#define idy(v) ((v)&7)
-#define popcnt(v) __builtin_popcountll(v)
-#define in(i,k) (((k)>>(i))&1)
-#define subset(x,y) (((x)&(y))==(x))
-
-template<typename... Args> string string_sprintf(const char* format,Args... args){
+template<class... Args> string string_sprintf(const char* format,Args... args){
   int length=snprintf(nullptr,0,format,args...);
 #ifdef memset0
   assert(length>=0);
@@ -122,11 +150,57 @@ template<typename... Args> string string_sprintf(const char* format,Args... args
   return str;
 }
 
+
+// Tools: data & globaldata
+struct Data{
+  bool enabled;
+  size_t limit;
+  string name,plain;
+
+  Data(string name,size_t limit):limit(limit),name(name){
+    enabled=false;
+  }
+  inline void parse(const string &source){
+    enabled=true;
+    this->plain=source;
+  }
+  inline string toString(){
+    if(!enabled)return "";
+    return this->plain;
+  }
+
+  inline void print(const string &data){
+    if(!enabled)return;
+    plain=data+plain;
+    if(plain.length()>limit){
+      plain.erase(plain.begin()+limit,plain.end());
+    }
+    if(this->name=="globaldata"){
+      log("\e[2m[%s]\e[0m %s",this->name.c_str(),data.c_str());
+    }
+  }
+  template<class... Args> inline void printf(const char *format,Args... args){
+    if(!enabled)return;
+    this->print(string_sprintf(format,args...));
+  }
+};
+Data data("data",100);
+Data globaldata("globaldata",10000);
+
+
+// Tools: Bit Operation
+#define id(i,j) (((i)<<3)|(j))
+#define idx(v) ((v)>>3)
+#define idy(v) ((v)&7)
+#define popcnt(v) __builtin_popcountll(v)
+#define in(i,k) (((k)>>(i))&1)
+#define subset(x,y) (((x)&(y))==(x))
+
 inline string u64ToHex(u64 value){
   return string_sprintf("0x%08X%08X",value>>32,value&(-1u));
 }
-inline vec<int> u64ToVec(u64 source){
-  vec<int> target;
+inline vector<int> u64ToVec(u64 source){
+  vector<int> target;
   for(int i=0;i<64;i++)if((source>>i)&1)target.push_back(i);
   return target;
 }
@@ -247,13 +321,13 @@ namespace Judger{
       name=base;
       plain=u64ToHex(value);
     }
-    inline MagicNumber(string base,vec<u64> value):type("u64"){
+    inline MagicNumber(string base,vector<u64> value):type("u64"){
       name=base+string_sprintf("[%lu]",value.size());
       plain=to_string(value,(function<string(u64)>)[](u64 x){return u64ToHex(x);});
     }
-    inline MagicNumber(string base,vec<vec<u64>> value):type("u64"){
+    inline MagicNumber(string base,vector<vector<u64>> value):type("u64"){
       name=base+string_sprintf("[%lu][%lu]",value.size(),value[0].size());
-      plain=to_string(value,(function<string(vec<u64>)>)[](const vec<u64> &x){
+      plain=to_string(value,(function<string(vector<u64>)>)[](const vector<u64> &x){
         return to_string(x,(function<string(u64)>)[](u64 x){return u64ToHex(x);});
       });
     }
@@ -262,7 +336,7 @@ namespace Judger{
     return "constexpr "+x.type+" "+x.name+"="+x.plain+";";
   }
 
-  vec<MagicNumber> out;
+  vector<MagicNumber> out;
   void build(){
     auto buildMap=[](const std::initializer_list<std::pair<int,int>> &source){
       u64 target=0;
@@ -274,7 +348,7 @@ namespace Judger{
     out.push_back(MagicNumber("corner",buildMap({{0,0},{0,7},{7,0},{7,7}})));
     out.push_back(MagicNumber("x_squares",buildMap({{1,1},{1,6},{6,1},{6,6}})));
     out.push_back(MagicNumber("c_squares",buildMap({{0,1},{1,0},{1,7},{0,6},{7,1},{6,0},{7,6},{6,7}})));
-    auto possibleMove=vec<u64>(8);
+    auto possibleMove=vector<u64>(8);
     for(int w=0;w<8;w++){
       for(int i=0;i<8;i++)
         for(int j=0;j<8;j++){
@@ -284,8 +358,8 @@ namespace Judger{
         }
     }
     out.push_back(MagicNumber("possibleMove",possibleMove));
-    auto stableEach=vec<u64>(64);
-    auto stableSide=vec<vec<u64>>(64);
+    auto stableEach=vector<u64>(64);
+    auto stableSide=vector<vector<u64>>(64);
     for(int x=0;x<8;x++)
       for(int y=0;y<8;y++){
         Map now;
@@ -322,8 +396,8 @@ namespace Judger{
   }
 }
 
-vec<int> walk[64][8];
-vec<u64> walkpath[64][8];
+vector<int> walk[64][8];
+vector<u64> walkpath[64][8];
 void init(){
   for(int sx=0;sx<8;sx++)
     for(int sy=0;sy<8;sy++)
@@ -363,7 +437,7 @@ template<const bit c> inline u64 Board::getMove()const{
   const u64 &board_u=this->map[c].plain;
   const u64 &board_v=this->map[!c].plain;
   u64 moves,board_v_inner,board_flip,board_v_adj;
-  board_v_inner=board_v&0x7E7E7E7E7E7E7E7Eull;
+  board_v_inner=board_v&(u64)0x7E7E7E7E7E7E7E7E;
   //E
   board_flip=(board_u>>1)&board_v_inner;
   board_flip|=(board_flip>>1)&board_v_inner;
@@ -451,41 +525,24 @@ template<const bit c> inline u64 Board::getStableOld()const{
   return res;
 }
 template<const bit c> inline u64 Board::getStable()const{
-  u64 board_move_e,board_move_w,board_move_n,board_move_s;
-  u64 board_move_ne,board_move_nw,board_move_se,board_move_sw;
-  board_move_e=this->map[c].plain;
-  board_move_e&=(board_move_e>>1)|0x8080808080808080;
-  board_move_e&=(board_move_e>>2)|0xc0c0c0c0c0c0c0c0;
-  board_move_e&=(board_move_e>>4)|0xf0f0f0f0f0f0f0f0;
-  board_move_w=this->map[c].plain;
-  board_move_w&=(board_move_w<<1)|0x0101010101010101;
-  board_move_w&=(board_move_w<<2)|0x0303030303030303;
-  board_move_w&=(board_move_w<<4)|0x0f0f0f0f0f0f0f0f;
-  board_move_n=this->map[c].plain;
-  board_move_n&=(board_move_n>>8)|0xff00000000000000;
-  board_move_n&=(board_move_n>>16)|0xffff000000000000;
-  board_move_n&=(board_move_n>>32)|0xffffffff00000000;
-  board_move_s=this->map[c].plain;
-  board_move_s&=(board_move_s<<8)|0x00000000000000ff;
-  board_move_s&=(board_move_s<<16)|0x000000000000ffff;
-  board_move_s&=(board_move_s<<32)|0x00000000ffffffff;
-  board_move_nw=this->map[c].plain;
-  board_move_nw&=(board_move_nw>>7)|0xff01010101010101;
-  board_move_nw&=(board_move_nw>>14)|0xffff030303030303;
-  board_move_nw&=(board_move_nw>>28)|0xffffffff0f0f0f0f;
-  board_move_se=this->map[c].plain;
-  board_move_se&=(board_move_se<<7)|0x80808080808080ff;
-  board_move_se&=(board_move_se<<14)|0xc0c0c0c0c0c0ffff;
-  board_move_se&=(board_move_se<<28)|0xf0f0f0f0ffffffff;
-  board_move_ne=this->map[c].plain;
-  board_move_ne&=(board_move_ne>>9)|0xff80808080808080;
-  board_move_ne&=(board_move_ne>>18)|0xffffc0c0c0c0c0c0;
-  board_move_ne&=(board_move_ne>>36)|0xfffffffff0f0f0f0;
-  board_move_sw=this->map[c].plain;
-  board_move_sw&=(board_move_sw<<9)|0x01010101010101ff;
-  board_move_sw&=(board_move_sw<<18)|0x030303030303ffff;
-  board_move_sw&=(board_move_sw<<36)|0x0f0f0f0fffffffff;
-  return (board_move_e|board_move_w)&(board_move_n|board_move_s)&(board_move_ne|board_move_sw)&(board_move_nw|board_move_se);
+  u64 stable=-1ull;
+  u64 moveSideA,moveSideB;
+#define evalutionStable(step,key0,key1,key2,key3,key4,key5) \
+      moveSideA=this->map[c].plain,                         \
+      moveSideA&=(moveSideA>>(step))|key0,                  \
+      moveSideA&=(moveSideA>>(step<<1))|key1,               \
+      moveSideA&=(moveSideA>>(step<<2))|key2,               \
+      moveSideB=this->map[c].plain,                         \
+      moveSideB&=(moveSideB<<(step))|key3,                  \
+      moveSideB&=(moveSideB<<(step<<1))|key4,               \
+      moveSideB&=(moveSideB<<(step<<2))|key5,               \
+      stable&=moveSideA|moveSideB
+  evalutionStable(1,0x8080808080808080,0xC0C0C0C0C0C0C0C0,0xF0F0F0F0F0F0F0F0,0x0101010101010101,0x0303030303030303,0x0F0F0F0F0F0F0F0F);
+  evalutionStable(8,0xFF00000000000000,0xFFFF000000000000,0xFFFFFFFF00000000,0x00000000000000FF,0x000000000000FFFF,0x00000000FFFFFFFF);
+  evalutionStable(7,0xFF01010101010101,0xFFFF030303030303,0xFFFFFFFF0F0F0F0F,0x80808080808080FF,0xC0C0C0C0C0C0FFFF,0xF0F0F0F0FFFFFFFF);
+  evalutionStable(9,0xFF80808080808080,0xFFFFC0C0C0C0C0C0,0xFFFFFFFFF0F0F0F0,0x01010101010101FF,0x030303030303FFFF,0x0F0F0F0FFFFFFFFF);
+#undef evalutionStable
+  return stable;
 }
 template<const bit c> inline int Board::getStableSize()const{
   return popcnt(this->getStable<c>());
@@ -517,51 +574,50 @@ template<const bit c> inline void Board::move(int i,int j){this->move<c>(id(i,j)
 template<const bit c> inline void Board::move(int u){
   if(!~u)return;
   this->map[c].set(u);
-  for(int w=0;w<8;w++)
-    for(int t=0;t<(int)walk[u][w].size();t++){
-      int v=walk[u][w][t];
-      if(this->map[c].get(v)){
-        this->map[c].plain^=walkpath[u][w][t];
-        this->map[!c].plain^=walkpath[u][w][t];
-        break;
+#define moveSide(w) \
+      for(int t=0;t<(int)walk[u][w].size();t++){ \
+        int v=walk[u][w][t]; \
+        if(this->map[c].get(v)){ \
+          this->map[c].plain^=walkpath[u][w][t]; \
+          this->map[!c].plain^=walkpath[u][w][t]; \
+          break; \
+        } \
+        if(!this->map[!c].get(v))break; \
       }
-      if(!this->map[!c].get(v))break;
-    }
+  moveSide(E);
+  moveSide(W);
+  moveSide(S);
+  moveSide(N);
+  moveSide(SW);
+  moveSide(NE);
+  moveSide(SE);
+  moveSide(NW);
+#undef moveSide
 }
 
 
 // Function: Judge
 int JudgeStatus=1;
 template<const bit c> inline int Board::judgeSide(int mov)const{
-  static constexpr int corner_pt=1800;
-  static constexpr int x_squares_pt=-600;
-  static constexpr int c_squares_pt=-200;
   int res=0;
   int cnt=this->map[c].count();
   if(!cnt)return -20040725;
   Map rest=this->rest();
+
   //边角定权
-  res+=this->map[c].intersection(Judger::corner)*corner_pt;
-  if(rest.get(0,0)){
-    if(this->map[c].get(1,0))res+=c_squares_pt;
-    if(this->map[c].get(0,1))res+=c_squares_pt;
-    if(this->map[c].get(1,1))res+=x_squares_pt;
-  }
-  if(rest.get(0,7)){
-    if(this->map[c].get(0,6))res+=c_squares_pt;
-    if(this->map[c].get(1,7))res+=c_squares_pt;
-    if(this->map[c].get(1,6))res+=x_squares_pt;
-  }
-  if(rest.get(7,0)){
-    if(this->map[c].get(6,0))res+=c_squares_pt;
-    if(this->map[c].get(7,1))res+=c_squares_pt;
-    if(this->map[c].get(6,1))res+=x_squares_pt;
-  }
-  if(rest.get(7,7)){
-    if(this->map[c].get(6,7))res+=c_squares_pt;
-    if(this->map[c].get(7,6))res+=c_squares_pt;
-    if(this->map[c].get(6,6))res+=x_squares_pt;
-  }
+  res+=this->map[c].intersection(Judger::corner)*1800;
+#define evalutionCorner(thisX,thisY,deltaX,deltaY)               \
+      if(rest.get(thisX,thisY)){                                 \
+        if(this->map[c].get(thisX+deltaX,thisY))res-=200;        \
+        if(this->map[c].get(thisX,thisY+deltaY))res-=200;        \
+        if(this->map[c].get(thisX+deltaX,thisY+deltaY))res-=600; \
+      }
+  evalutionCorner(0,0,1,1);
+  evalutionCorner(0,7,1,-1);
+  evalutionCorner(7,0,-1,1);
+  evalutionCorner(7,7,-1,-1);
+#undef evalutionCorner
+
   //行动力
   res+=mov*30;
   switch(mov){
@@ -569,10 +625,12 @@ template<const bit c> inline int Board::judgeSide(int mov)const{
     case 1:res-=300;break;
     case 2:res-=100;break;
   }
+
   //稳定子
   int sta=this->getStableSize<c>();
   res+=sta*50;
   if(sta>=32)return 20040725;
+
   //占子策略
   switch(JudgeStatus){
     case 1:
@@ -588,7 +646,7 @@ template<const bit c> inline int Board::judgeSide(int mov)const{
 }
 template<const bit c> inline int Board::judgeFinal()const{
   int cnt[]={this->map[0].count(),this->map[1].count()};
-  return cnt[0]==cnt[1]?0:((cnt[c]>cnt[!c]?20040725:-20040725)<<1);
+  return cnt[0]==cnt[1]?0:2*(cnt[c]>cnt[!c]?20040725:-20040725);
 }
 template<const bit c> inline int Board::judge()const{
   int movU=this->getMoveSize<c>();
@@ -605,13 +663,12 @@ namespace AlphaBetaSearch{
   const int INFW=1e9;
   bit col;
   u32 tick;
-  int maxDepth,stackValue[64][64];
+  int ans,maxd,stackValue[64][64];
   Board board,stackBoard[64][64];
-  std::pair<int,int> ans;
-  function<void(int)> callback;
+  function<int(int)> callback;
 
   int bruteForce(){
-    vec<Movement> moves=u64ToVec(col?board.getMove<1>():board.getMove<0>())
+    vector<Movement> moves=u64ToVec(col?board.getMove<1>():board.getMove<0>())
       .map((function<Movement(int)>)[&](int move){
         return Movement(move,board,col);
       });
@@ -624,7 +681,7 @@ namespace AlphaBetaSearch{
   }
   
   int randomChoose(){
-    vec<int> moves=u64ToVec(col?board.getMove<1>():board.getMove<0>());
+    vector<int> moves=u64ToVec(col?board.getMove<1>():board.getMove<0>());
     if(!moves.size()){
       return -1;
     }else{
@@ -633,26 +690,25 @@ namespace AlphaBetaSearch{
   }
 
   void finishSearch(int movement){
-    debug("[alpha-beta] maxDepth=%d answerWeight=%d\n",maxDepth,ans.sec);
+    globaldata.printf("maxd=%d\n",maxd);
     if(col?board.checkMove<1>(movement):board.checkMove<0>(movement)){
-      callback(movement);
+      exit(callback(movement));
     }else{
-      debug("[error] Illegal moves!!! (move=%d)",movement);
-      callback(rand(0,2)?bruteForce():randomChoose());
+      globaldata.printf("[error] Illegal moves!!! (%d,%d)\n",idx(movement),idy(movement));
+      exit(callback(rand(0,2)?bruteForce():randomChoose()));
     }
-    exit(0);
   }
 
   template<const bit c> int search(const Board &board,int step,int alpha,int beta){
     if(!(++tick&1023)&&clock()/(double)CLOCKS_PER_SEC>0.96){
-      return finishSearch(ans.fir),0;
+      return finishSearch(ans),0;
     }
-    if(step>maxDepth){
+    if(step>maxd){
       return board.judge<c>();
     }
 
-    vec<int> ord;
-    std::pair<int,int> best(-1,-INFW);
+    vector<int> ord;
+    int best=-1;
     u64 moves=board.getMove<c>();
     for(int i=0;i<64;i++)if((moves>>i)&1){
       ord.push_back(i);
@@ -679,7 +735,7 @@ namespace AlphaBetaSearch{
       if(val>=beta)return val;
       if(val>alpha){
         alpha=val;
-        best=std::make_pair(i,val);
+        best=i;
         flagPVS=true;
       }
     }
@@ -688,7 +744,7 @@ namespace AlphaBetaSearch{
       if(val>=beta)return val;
       if(val>alpha){
         alpha=val;
-        best=std::make_pair(-1,val);
+        best=-1;
       }
     }
 
@@ -703,34 +759,41 @@ namespace AlphaBetaSearch{
     }
   }
 
-  void solve(const Board &_board,bit _col,function<void(int)> _callback){
+  void solve(const Board &_board,bit _col,function<int(int)> _callback){
     board=_board,col=_col,callback=_callback;
 
     if(!(col?board.getMove<1>():board.getMove<0>())){
       log("[alpha-beta] no moves at all!");
       return finishSearch(-1);
     }
-    // if(board.map[col].count()<=3&&board.map[col^1].count()<=3){
-    //   return finishSearch(randomChoose());
-    // }
-
-    ans=std::make_pair(-1,-INFW);
-    int val=-1,alpha,beta;
-    for(maxDepth=6;maxDepth<64;maxDepth++){
-      if(~val){
-        alpha=val-sqrt(val);
-        beta=val+sqrt(val);
-        val=search(col,board,alpha,beta);
-        if(val<=alpha||val>=beta){
-          val=search(col,board,-INFW,INFW);
-        }
-      }else{
-        search(col,board,-INFW,INFW);
-      }
-      Movement ansMovement(ans.fir,board,col);
-      debug("ans=[%d %d] : x=%d y=%d value=%d\n",ans.fir,ans.sec,idx(ans.fir),idy(ans.fir),ansMovement.value);
+    if(board.map[col].count()<=3&&board.map[col^1].count()<=3){
+      return finishSearch(randomChoose());
     }
-    finishSearch(ans.fir);
+
+    ans=-1;
+    int val=-1,alpha,beta;
+    for(maxd=6;maxd<64;maxd++){
+      // if(~val){
+      //   alpha=val-sqrt(val);
+      //   beta=val+sqrt(val);
+      //   val=search(col,board,alpha,beta);
+      //   if(val<=alpha||val>=beta){
+      //     val=search(col,board,-INFW,INFW);
+      //   }
+      // }else{
+      //   val=search(col,board,-INFW,INFW);
+      // }
+      val=search(col,board,-INFW,INFW);
+
+      Movement ansMovement(ans,board,col);
+      string debugMessage(string_sprintf("val=%d mov=%d(%d,%d)\n",val,ans,idx(ans),idy(ans)));
+      log("\e[36m%s\e[0m",debugMessage.c_str());
+      data.print(debugMessage);
+      if(maxd<16){
+        globaldata.print(debugMessage);
+      }
+    }
+    finishSearch(ans);
   }
 }
 
@@ -738,8 +801,13 @@ namespace AlphaBetaSearch{
 // Main: init & IO
 int main(){
 #ifdef memset0
+#ifdef SimpleIO
   freopen("testinput.in","r",stdin);
-  Judger::build();
+#endif
+#ifdef JsonIO
+  freopen("testinput.json","r",stdin);
+#endif
+  // Judger::build();
 #endif
   log("[bot] start!\n");
   for(int t=rand(0,233);t--;)fakeRng();
@@ -750,17 +818,38 @@ int main(){
   board.map[1].set(3,4),board.map[1].set(4,3);
 
   int n;
-  vec<std::pair<int,int>> go;
-  cin>>n;
-  if(n>16){
-    JudgeStatus=2;
-  }
+  vector<std::pair<int,int>> go;
 
+#ifdef SimpleIO
+  cin>>n;
   go.resize((n<<1)-1);
   for(int i=0;i<(int)go.size();i++){
     cin>>go[i].fir>>go[i].sec;
   }
+#endif
+
+#ifdef JsonIO
+  string str;
+  std::getline(cin,str);
+  Json::Reader reader;
+  Json::Value input;
+  reader.parse(str,input);
+  n=input["requests"].size();
+  for(int i=0;i<n-1;i++){
+    go.push_back(std::make_pair(input["requests"][i]["x"].asInt(),input["requests"][i]["y"].asInt()));
+    go.push_back(std::make_pair(input["responses"][i]["x"].asInt(),input["responses"][i]["y"].asInt()));
+  }
+  go.push_back(std::make_pair(input["requests"][n-1]["x"].asInt(),input["requests"][n-1]["y"].asInt()));
+  data.parse(input.isMember("data")?input["data"].asString():"");
+  globaldata.parse(input.isMember("globaldata")?input["globaldata"].asString():"");
+#endif
+
+  globaldata.printf("=== Round: %d ===\n",n);
+  if(n>16){
+    JudgeStatus=2;
+  }
   bit col=go.front().fir==-1&&go.front().sec==-1;
+
   for(int i=0;i<(int)go.size();i++)
     if(~go[i].fir&&~go[i].sec){
       if((i&1)^col){
@@ -773,11 +862,23 @@ int main(){
 
   AlphaBetaSearch::solve(board,col,[&](int movement){
     debug("[bot] finished. (clock=%.6lf)\n",clock()/(double)CLOCKS_PER_SEC);
-    if(~movement){
-      cout<<idx(movement)<<" "<<idy(movement)<<endl;
-    }else{
-      cout<<"-1 -1"<<endl;
-    }
+    int resultX=~movement?idx(movement):-1;
+    int resultY=~movement?idy(movement):-1;
+
+#ifdef SimpleIO
+    cout<<resultX<<" "<<resultY<<endl;
+#endif
+
+#ifdef JsonIO
+    Json::Value ret;
+    ret["response"]["x"]=resultX;
+    ret["response"]["y"]=resultY;
+    ret["data"]=data.toString();
+    ret["globaldata"]=globaldata.toString();
+    Json::FastWriter writer;
+    cout<<writer.write(ret)<<endl;
+#endif
+    return 0;
   });
 
   return -1;
