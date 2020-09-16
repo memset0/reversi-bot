@@ -10,10 +10,16 @@
 #include<sstream>
 #include<vector>
 
-#define SimpleIO 1
+// #define SimpleIO 1
 #ifndef SimpleIO
   #include"jsoncpp/json.h"
   #define JsonIO 1
+#endif
+
+#ifdef RUNTIME_PY
+  constexpr double TIME_LIMIT=5.96;
+#else
+  constexpr double TIME_LIMIT=0.96;
 #endif
 
 #define fir first
@@ -128,6 +134,18 @@ struct string:std::string{
     delete[] src;
     delete[] tar;
     return res;
+  }
+
+  template<class... Args> static string sprintf(const char* format,Args... args){
+    int length=snprintf(nullptr,0,format,args...);
+  #ifdef memset0
+    assert(length>=0);
+  #endif
+    char* buf=new char[length+1];
+    snprintf(buf,length+1,format,args...);
+    string str(buf);
+    delete[] buf;
+    return str;
   }
 };
 
@@ -690,7 +708,10 @@ namespace AlphaBetaSearch{
   }
 
   void finishSearch(int movement){
-    globaldata.printf("maxd=%d\n",maxd);
+    string debug_message=string().sprintf("maxd=%d\n",maxd);
+    log("\e[32m%s\e[0m",debug_message.c_str());
+    data.print(debug_message);
+    globaldata.print(debug_message);
     if(col?board.checkMove<1>(movement):board.checkMove<0>(movement)){
       exit(callback(movement));
     }else{
@@ -700,7 +721,7 @@ namespace AlphaBetaSearch{
   }
 
   template<const bit c> int search(const Board &board,int step,int alpha,int beta){
-    if(!(++tick&1023)&&clock()/(double)CLOCKS_PER_SEC>0.96){
+    if(!(++tick&1023)&&clock()/(double)CLOCKS_PER_SEC>TIME_LIMIT){
       return finishSearch(ans),0;
     }
     if(step>maxd){
@@ -766,24 +787,24 @@ namespace AlphaBetaSearch{
       log("[alpha-beta] no moves at all!");
       return finishSearch(-1);
     }
-    if(board.map[col].count()<=3&&board.map[col^1].count()<=3){
-      return finishSearch(randomChoose());
-    }
+    // if(board.map[col].count()<=3&&board.map[col^1].count()<=3){
+    //   return finishSearch(randomChoose());
+    // }
 
     ans=-1;
+    static constexpr int window=100;
     int val=-1,alpha,beta;
     for(maxd=6;maxd<64;maxd++){
-      // if(~val){
-      //   alpha=val-sqrt(val);
-      //   beta=val+sqrt(val);
-      //   val=search(col,board,alpha,beta);
-      //   if(val<=alpha||val>=beta){
-      //     val=search(col,board,-INFW,INFW);
-      //   }
-      // }else{
-      //   val=search(col,board,-INFW,INFW);
-      // }
-      val=search(col,board,-INFW,INFW);
+      if(~val){
+        alpha=val-window;
+        beta=val+window;
+        val=search(col,board,alpha,beta);
+        if(val<=alpha||val>=beta){
+          val=search(col,board,-INFW,INFW);
+        }
+      }else{
+        val=search(col,board,-INFW,INFW);
+      }
 
       Movement ansMovement(ans,board,col);
       string debugMessage(string_sprintf("val=%d mov=%d(%d,%d)\n",val,ans,idx(ans),idy(ans)));
